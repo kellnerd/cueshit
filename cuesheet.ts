@@ -7,4 +7,12 @@ export interface Cue {
 
 export type CueFormatter = (cue: Cue) => string;
 
-export type CueParser = (input: string) => Cue[];
+export interface CueSheet {
+  cues: Cue[];
+  title?: string;
+  duration?: number;
+}
+
+export type CueSheetFormatter = (cuesheet: CueSheet) => string;
+
+export type CueSheetParser = (input: string) => CueSheet;

@@ -1,7 +1,7 @@
-import { Cue, CueFormatter, CueParser } from "../cuesheet.ts";
+import { Cue, CueFormatter, CueSheetParser } from "../cuesheet.ts";
 import { formatDuration, parseDuration } from "../duration.ts";
 
-export const parseYouTubeDescription: CueParser = function (description) {
+export const parseYouTubeDescription: CueSheetParser = function (description) {
   const chapterPattern = /^(?<timestamp>(\d+:)?\d{2}:\d{2})\s+(?<title>.+)/;
   const chapters: Cue[] = [];
   let previousChapter: Cue | undefined = undefined;
@@ -24,7 +24,9 @@ export const parseYouTubeDescription: CueParser = function (description) {
     previousChapter = chapter;
   }
 
-  return chapters;
+  return {
+    cues: chapters,
+  };
 };
 
 export const formatYouTubeChapter: CueFormatter = function (cue) {

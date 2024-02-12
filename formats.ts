@@ -1,4 +1,8 @@
-import type { CueFormatter, CueParser } from "./cuesheet.ts";
+import type {
+  CueFormatter,
+  CueSheetFormatter,
+  CueSheetParser,
+} from "./cuesheet.ts";
 import { formatAudacityLabel } from "./format/audacity_labels.ts";
 import { formatMusicBrainzTrack } from "./format/musicbrainz_tracklist.ts";
 import {
@@ -8,23 +12,24 @@ import {
 
 export interface CueFormat {
   name: string;
-  formatter?: CueFormatter;
-  parser?: CueParser;
+  formatCue?: CueFormatter;
+  format?: CueSheetFormatter;
+  parse?: CueSheetParser;
 }
 
 const formats: Record<string, CueFormat | undefined> = {
   "audacity": {
     name: "Audacity Label Track",
-    formatter: formatAudacityLabel,
+    formatCue: formatAudacityLabel,
   },
   "musicbrainz": {
     name: "MusicBrainz Track Parser Tracklist",
-    formatter: formatMusicBrainzTrack,
+    formatCue: formatMusicBrainzTrack,
   },
   "youtube": {
     name: "Youtube Description with Chapters",
-    formatter: formatYouTubeChapter,
-    parser: parseYouTubeDescription,
+    formatCue: formatYouTubeChapter,
+    parse: parseYouTubeDescription,
   },
 };
 
