@@ -13,7 +13,7 @@ export interface CueSheet {
   duration?: number;
 }
 
-export type CueSheetFormatter = (cuesheet: CueSheet) => string;
+export type CueSheetFormatter = (cueSheet: CueSheet) => string;
 
 export type CueSheetParser = (input: string) => CueSheet;
 
