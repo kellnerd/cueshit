@@ -35,7 +35,7 @@ export const parseYouTubeDescription: CueSheetParser = function (description) {
 };
 
 export const formatYouTubeChapter: CueFormatter = function (cue) {
-  return `${formatDuration(cue.duration)} ${cue.title}`;
+  return `${formatDuration(cue.timeOffset)} ${cue.title}`;
 };
 
 export default {
