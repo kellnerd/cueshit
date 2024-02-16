@@ -1,4 +1,4 @@
-import { CueFormatter } from "../cuesheet.ts";
+import type { CueFormat, CueFormatter } from "../cuesheet.ts";
 
 export const formatAudacityLabel: CueFormatter = function (cue) {
   const defaultDuration = 1;
@@ -8,3 +8,8 @@ export const formatAudacityLabel: CueFormatter = function (cue) {
     cue.title,
   ].join("\t");
 };
+
+export default {
+  name: "Audacity Label Track",
+  formatCue: formatAudacityLabel,
+} as CueFormat;

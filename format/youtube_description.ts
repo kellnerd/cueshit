@@ -1,4 +1,9 @@
-import { Cue, CueFormatter, CueSheetParser } from "../cuesheet.ts";
+import type {
+  Cue,
+  CueFormat,
+  CueFormatter,
+  CueSheetParser,
+} from "../cuesheet.ts";
 import { formatDuration, parseDuration } from "../duration.ts";
 
 export const parseYouTubeDescription: CueSheetParser = function (description) {
@@ -32,3 +37,9 @@ export const parseYouTubeDescription: CueSheetParser = function (description) {
 export const formatYouTubeChapter: CueFormatter = function (cue) {
   return `${formatDuration(cue.duration)} ${cue.title}`;
 };
+
+export default {
+  name: "Youtube Description with Chapters",
+  formatCue: formatYouTubeChapter,
+  parse: parseYouTubeDescription,
+} as CueFormat;

@@ -1,36 +1,14 @@
-import type {
-  CueFormatter,
-  CueSheetFormatter,
-  CueSheetParser,
-} from "./cuesheet.ts";
-import { formatAudacityLabel } from "./format/audacity_labels.ts";
-import { formatMusicBrainzTrack } from "./format/musicbrainz_tracklist.ts";
-import {
-  formatYouTubeChapter,
-  parseYouTubeDescription,
-} from "./format/youtube_description.ts";
+import type { CueFormat } from "./cuesheet.ts";
 
-export interface CueFormat {
-  name: string;
-  formatCue?: CueFormatter;
-  format?: CueSheetFormatter;
-  parse?: CueSheetParser;
-}
+import audacity_labels from "./format/audacity_labels.ts";
+import musicbrainz_tracklist from "./format/musicbrainz_tracklist.ts";
+import youtube_description from "./format/youtube_description.ts";
 
+/** Maps format IDs to format specifications. */
 const formats: Record<string, CueFormat | undefined> = {
-  "audacity": {
-    name: "Audacity Label Track",
-    formatCue: formatAudacityLabel,
-  },
-  "musicbrainz": {
-    name: "MusicBrainz Track Parser Tracklist",
-    formatCue: formatMusicBrainzTrack,
-  },
-  "youtube": {
-    name: "Youtube Description with Chapters",
-    formatCue: formatYouTubeChapter,
-    parse: parseYouTubeDescription,
-  },
+  "audacity": audacity_labels,
+  "musicbrainz": musicbrainz_tracklist,
+  "youtube": youtube_description,
 };
 
 export default formats;
