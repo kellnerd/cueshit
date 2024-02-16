@@ -1,8 +1,10 @@
+import { bold, yellow } from "https://deno.land/std@0.196.0/fmt/colors.ts";
 import {
   Command,
   EnumType,
   ValidationError,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
+import { Table } from "https://deno.land/x/cliffy@v1.0.0-rc.3/table/mod.ts";
 import formats from "./formats.ts";
 
 const formatIds = Object.keys(formats);
@@ -44,6 +46,23 @@ export const cli = new Command()
     const input = await Deno.readTextFile(inputPath);
     const cueSheet = parseCueSheet(input);
     console.log(formatCueSheet(cueSheet));
+  })
+  .command("formats", "List all supported formats.")
+  .action(() => {
+    const supported = (value: unknown) => value ? "X" : "";
+    new Table()
+      .header(["ID", "Name", "Input", "Output"].map(bold))
+      .body(
+        Object.entries(formats).map(([id, format]) => [
+          yellow(id),
+          format?.name,
+          supported(format?.parse),
+          supported(format?.format ?? format?.formatCue),
+        ]),
+      )
+      .columns([{}, {}, { align: "center" }, { align: "center" }])
+      .padding(2)
+      .render();
   });
 
 if (import.meta.main && Deno.args.length) {
