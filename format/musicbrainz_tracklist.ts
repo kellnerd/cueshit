@@ -28,7 +28,8 @@ export const parseMusicBrainzTrackListing: CueSheetParser = function (listing) {
 
     const track: Cue = {
       title: trackMatch.title,
-      position: parseInt(trackMatch.position),
+      position: parseInt(trackMatch.position) ||
+        (previousTrack ? previousTrack.position + 1 : 1),
       duration: parseDuration(trackMatch.duration),
       timeOffset: previousTrack
         ? previousTrack.timeOffset + previousTrack.duration!
