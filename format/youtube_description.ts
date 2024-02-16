@@ -4,7 +4,7 @@ import type {
   CueFormatter,
   CueSheetParser,
 } from "../cuesheet.ts";
-import { formatDuration, parseDuration } from "../duration.ts";
+import { getDurationFormatter, parseDuration } from "../duration.ts";
 
 export const parseYouTubeDescription: CueSheetParser = function (description) {
   const chapterPattern = /^(?<timestamp>(\d+:)?\d{2}:\d{2})\s+(?<title>.+)/;
@@ -34,8 +34,10 @@ export const parseYouTubeDescription: CueSheetParser = function (description) {
   };
 };
 
+const formatTimestamp = getDurationFormatter();
+
 export const formatYouTubeChapter: CueFormatter = function (cue) {
-  return `${formatDuration(cue.timeOffset)} ${cue.title}`;
+  return `${formatTimestamp(cue.timeOffset)} ${cue.title}`;
 };
 
 export default {
