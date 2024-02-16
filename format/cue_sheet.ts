@@ -3,8 +3,8 @@ import type {
   CueFormatter,
   CueSheetFormatter,
 } from "../cuesheet.ts";
-import { getDurationFormatter, padNum, TimeUnit } from "../duration.ts";
-import { isDefined } from '../utils.ts';
+import { getDurationFormatter, TimeUnit } from "../duration.ts";
+import { isDefined, padNum } from "../utils.ts";
 
 const formatTimestamp = getDurationFormatter({
   largestUnit: TimeUnit.minutes,

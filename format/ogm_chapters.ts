@@ -1,5 +1,6 @@
 import type { CueFormat, CueFormatter } from "../cuesheet.ts";
-import { getDurationFormatter, padNum, TimeUnit } from "../duration.ts";
+import { getDurationFormatter, TimeUnit } from "../duration.ts";
+import { padNum } from "../utils.ts";
 
 const formatTimestamp = getDurationFormatter({
   largestUnit: TimeUnit.hours,

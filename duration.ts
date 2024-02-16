@@ -1,3 +1,5 @@
+import { padNum } from './utils.ts';
+
 /** Parses a duration in seconds from the given `m:s` or `H:m:s` string. */
 export function parseDuration(time: string): number {
   const timeComponents = time.split(":").map(Number);
@@ -74,9 +76,4 @@ function toDurationUnits(seconds: number, {
     });
   }
   return units;
-}
-
-/** Pads the given number with zeros to reach the given length. */
-export function padNum(value: number, maxLength: number) {
-  return value.toFixed().padStart(maxLength, "0");
 }
