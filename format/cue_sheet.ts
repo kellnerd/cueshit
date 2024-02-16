@@ -4,6 +4,7 @@ import type {
   CueSheetFormatter,
 } from "../cuesheet.ts";
 import { getDurationFormatter, padNum, TimeUnit } from "../duration.ts";
+import { isDefined } from '../utils.ts';
 
 const formatTimestamp = getDurationFormatter({
   largestUnit: TimeUnit.minutes,
@@ -13,7 +14,7 @@ const formatTimestamp = getDurationFormatter({
 });
 
 function command(name: string, ...values: Array<string | number | undefined>) {
-  return values.every(Boolean) ? `${name} ${values.join(" ")}` : undefined;
+  return values.every(isDefined) ? `${name} ${values.join(" ")}` : undefined;
 }
 
 export const formatCue: CueFormatter = function (cue) {
@@ -22,7 +23,7 @@ export const formatCue: CueFormatter = function (cue) {
     command("  TRACK", trackNumber, "AUDIO"),
     command("    TITLE", cue.title),
     command("    INDEX", "01", formatTimestamp(cue.timeOffset)),
-  ].filter(Boolean).join("\n");
+  ].filter(isDefined).join("\n");
 };
 
 export const formatCueSheet: CueSheetFormatter = function (cueSheet) {
@@ -30,7 +31,7 @@ export const formatCueSheet: CueSheetFormatter = function (cueSheet) {
     command("TITLE", cueSheet.title),
     // command("FILE", cueSheet.file, "WAVE"),
     ...cueSheet.cues.map(formatCue),
-  ].filter(Boolean).join("\n");
+  ].filter(isDefined).join("\n");
 };
 
 export default {
