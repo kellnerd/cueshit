@@ -26,8 +26,13 @@ export const parseMusicBrainzTrackListing: CueSheetParser = function (listing) {
     const trackMatch = line.match(trackPattern)?.groups;
     if (!trackMatch) continue;
 
+    // Try to extract trailing performer from title.
+    const performerMatch = trackMatch.title.match(/(.+) - (.+)/);
+    const [title, performer] = performerMatch?.slice(1) ?? [trackMatch.title];
+
     const track: Cue = {
-      title: trackMatch.title,
+      title,
+      performer,
       position: parseInt(trackMatch.position) ||
         (previousTrack ? previousTrack.position + 1 : 1),
       duration: parseDuration(trackMatch.duration),
