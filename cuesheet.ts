@@ -2,6 +2,7 @@ export interface Cue {
   position: number;
   title: string;
   timeOffset: number;
+  performer?: string;
   duration?: number;
 }
 
@@ -10,6 +11,8 @@ export type CueFormatter = (cue: Cue) => string;
 export interface CueSheet {
   cues: Cue[];
   title?: string;
+  performer?: string;
+  mediaFile?: string;
   duration?: number;
 }
 

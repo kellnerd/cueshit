@@ -22,6 +22,7 @@ export const formatCue: CueFormatter = function (cue) {
   return [
     command("  TRACK", trackNumber, "AUDIO"),
     command("    TITLE", cue.title),
+    command("    PERFORMER", cue.performer),
     command("    INDEX", "01", formatTimestamp(cue.timeOffset)),
   ].filter(isDefined).join("\n");
 };
@@ -29,7 +30,8 @@ export const formatCue: CueFormatter = function (cue) {
 export const formatCueSheet: CueSheetFormatter = function (cueSheet) {
   return [
     command("TITLE", cueSheet.title),
-    // command("FILE", cueSheet.file, "WAVE"),
+    command("PERFORMER", cueSheet.performer),
+    command("FILE", cueSheet.mediaFile, "WAVE"),
     ...cueSheet.cues.map(formatCue),
   ].filter(isDefined).join("\n");
 };
