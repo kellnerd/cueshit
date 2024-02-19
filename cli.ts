@@ -22,10 +22,11 @@ export const cli = new Command()
     Convert between different cuesheet/chapter/tracklist formats.
 
     Reads from standard input if no input path is specified.
-    Writes to standard output.
+    Writes to standard output if no output path is specified.
   `)
   .type("input-format", new EnumType(inputFormatIds))
   .type("output-format", new EnumType(outputFormatIds))
+  .option("-o, --output <path:file>", "Path to the output file.")
   .option("-f, --from <format:input-format>", "ID of the input format.", {
     required: true,
   })
@@ -59,7 +60,13 @@ export const cli = new Command()
       ? Deno.readTextFile(inputPath)
       : toText(Deno.stdin.readable));
     const cueSheet = parseCueSheet(input);
-    console.log(formatCueSheet(cueSheet));
+    const output = formatCueSheet(cueSheet);
+
+    if (options.output) {
+      await Deno.writeTextFile(options.output, output);
+    } else {
+      console.log(output);
+    }
   })
   .command("formats", "List all supported formats.")
   .action(() => {
