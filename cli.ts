@@ -7,17 +7,23 @@ import {
 import { Table } from "https://deno.land/x/cliffy@v1.0.0-rc.3/table/mod.ts";
 import formats from "./formats.ts";
 
-const formatIds = Object.keys(formats);
+const inputFormatIds = Object.entries(formats)
+  .filter(([_id, format]) => format?.parse)
+  .map(([id, _format]) => id);
+const outputFormatIds = Object.entries(formats)
+  .filter(([_id, format]) => format?.format ?? format?.formatCue)
+  .map(([id, _format]) => id);
 
 export const cli = new Command()
   .name("cueshit")
   .version("0.1.0")
   .description("Convert between different cuesheet/chapter/tracklist formats.")
-  .type("format", new EnumType(formatIds))
-  .option("-f, --from <format:format>", "ID of the input format.", {
+  .type("input-format", new EnumType(inputFormatIds))
+  .type("output-format", new EnumType(outputFormatIds))
+  .option("-f, --from <format:input-format>", "ID of the input format.", {
     required: true,
   })
-  .option("-t, --to <format:format>", "ID of the output format.", {
+  .option("-t, --to <format:output-format>", "ID of the output format.", {
     required: true,
   })
   .arguments("<input-path:file>")
