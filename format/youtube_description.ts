@@ -7,7 +7,7 @@ import type {
 import { getDurationFormatter, parseDuration } from "../duration.ts";
 
 export const parseYouTubeDescription: CueSheetParser = function (description) {
-  const chapterPattern = /^(?<timestamp>(\d+:)?\d{2}:\d{2})\s+(?<title>.+)/;
+  const chapterPattern = /^(?<timestamp>\d{1,2}:(\d{2}:)?\d{2})\s+(?<title>.+)/;
   const chapters: Cue[] = [];
   let previousChapter: Cue | undefined = undefined;
 
