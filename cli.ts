@@ -1,4 +1,5 @@
-import { bold, yellow } from "https://deno.land/std@0.196.0/fmt/colors.ts";
+import { bold, yellow } from "https://deno.land/std@0.210.0/fmt/colors.ts";
+import { toText } from "https://deno.land/std@0.210.0/streams/to_text.ts";
 import {
   Command,
   EnumType,
@@ -17,7 +18,12 @@ const outputFormatIds = Object.entries(formats)
 export const cli = new Command()
   .name("cueshit")
   .version("0.1.0")
-  .description("Convert between different cuesheet/chapter/tracklist formats.")
+  .description(`
+    Convert between different cuesheet/chapter/tracklist formats.
+
+    Reads from standard input if no input path is specified.
+    Writes to standard output.
+  `)
   .type("input-format", new EnumType(inputFormatIds))
   .type("output-format", new EnumType(outputFormatIds))
   .option("-f, --from <format:input-format>", "ID of the input format.", {
@@ -26,7 +32,7 @@ export const cli = new Command()
   .option("-t, --to <format:output-format>", "ID of the output format.", {
     required: true,
   })
-  .arguments("<input-path:file>")
+  .arguments("[input-path:file]")
   .action(async (options, inputPath) => {
     const inputFormat = formats[options.from];
     const parseCueSheet = inputFormat?.parse;
@@ -49,7 +55,9 @@ export const cli = new Command()
       }
     }
 
-    const input = await Deno.readTextFile(inputPath);
+    const input = await (inputPath
+      ? Deno.readTextFile(inputPath)
+      : toText(Deno.stdin.readable));
     const cueSheet = parseCueSheet(input);
     console.log(formatCueSheet(cueSheet));
   })
