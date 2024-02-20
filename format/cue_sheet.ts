@@ -15,7 +15,18 @@ const formatTimestamp = getDurationFormatter({
 });
 
 function command(name: string, ...values: Array<string | number | undefined>) {
-  return values.every(isDefined) ? `${name} ${values.join(" ")}` : undefined;
+  if (values.every(isDefined)) {
+    return `${name} ${
+      values.map((value) => {
+        if (typeof value === "string" && value.includes(" ")) {
+          // There is no standard to escape double quotes, so we replace them.
+          return `"${value.replaceAll('"', "''")}"`;
+        } else {
+          return value;
+        }
+      }).join(" ")
+    }`;
+  }
 }
 
 export const formatCue: CueFormatter = function (cue) {
