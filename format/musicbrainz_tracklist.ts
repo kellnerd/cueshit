@@ -22,7 +22,7 @@ export const parseMusicBrainzTrackListing: CueSheetParser = function (listing) {
   const tracks: Cue[] = [];
   let previousTrack: Cue | undefined = undefined;
 
-  for (const line of listing.split("\n")) {
+  for (const line of listing.split(/\r?\n/)) {
     const trackMatch = line.match(trackPattern)?.groups;
     if (!trackMatch) continue;
 

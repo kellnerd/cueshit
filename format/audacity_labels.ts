@@ -12,7 +12,7 @@ export const formatAudacityLabel: CueFormatter = function (cue) {
 
 export const parseAudacityLabels: CueSheetParser = function (lines) {
   return {
-    cues: lines.split("\n").map((line, index) => {
+    cues: lines.split(/\r?\n/).map((line, index) => {
       const [startTime, endTime, label] = line.split("\t");
       const timeOffset = parseFloat(startTime);
       if (!label || isNaN(timeOffset)) return;

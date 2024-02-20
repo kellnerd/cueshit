@@ -11,7 +11,7 @@ export const parseYouTubeDescription: CueSheetParser = function (description) {
   const chapters: Cue[] = [];
   let previousChapter: Cue | undefined = undefined;
 
-  for (const line of description.split("\n")) {
+  for (const line of description.split(/\r?\n/)) {
     const chapterMatch = line.match(chapterPattern)?.groups;
     if (!chapterMatch) continue;
 
