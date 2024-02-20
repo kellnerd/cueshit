@@ -10,6 +10,7 @@ const formatTimestamp = getDurationFormatter({
   largestUnit: TimeUnit.minutes,
   smallestUnit: TimeUnit.subSeconds,
   padLargestUnit: true,
+  subSecondSeparator: ":",
   subSecondUnits: 75, // frames
 });
 
