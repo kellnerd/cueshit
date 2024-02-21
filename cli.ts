@@ -19,20 +19,20 @@ export const cli = new Command()
   .name("cueshit")
   .version("0.1.0")
   .description(`
-    Convert between different cuesheet/chapter/tracklist formats.
+    Convert between different cue sheet / chapter / tracklist formats.
 
     Reads from standard input if no input path is specified.
     Writes to standard output if no output path is specified.
   `)
   .type("input-format", new EnumType(inputFormatIds))
   .type("output-format", new EnumType(outputFormatIds))
-  .option("-o, --output <path:file>", "Path to the output file.")
   .option("-f, --from <format:input-format>", "ID of the input format.", {
     required: true,
   })
   .option("-t, --to <format:output-format>", "ID of the output format.", {
     required: true,
   })
+  .option("-o, --output <path:file>", "Path to the output file.")
   .option("--sheet.* <value>", "Set the value of a cue sheet property.")
   .arguments("[input-path:file]")
   .action(async (options, inputPath) => {
