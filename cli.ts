@@ -33,6 +33,7 @@ export const cli = new Command()
   .option("-t, --to <format:output-format>", "ID of the output format.", {
     required: true,
   })
+  .option("--sheet.* <value>", "Set the value of a cue sheet property.")
   .arguments("[input-path:file]")
   .action(async (options, inputPath) => {
     const inputFormat = formats[options.from];
@@ -60,6 +61,17 @@ export const cli = new Command()
       ? Deno.readTextFile(inputPath)
       : toText(Deno.stdin.readable));
     const cueSheet = parseCueSheet(input);
+
+    for (const [key, value] of Object.entries(options.sheet ?? {})) {
+      if (key === "title" || key === "performer" || key === "mediaFile") {
+        cueSheet[key] = value;
+      } else if (key === "duration") {
+        cueSheet[key] = parseFloat(value!);
+      } else {
+        throw new ValidationError(`Cue sheets have no "${key}" property`);
+      }
+    }
+
     const output = formatCueSheet(cueSheet);
 
     if (options.output) {
