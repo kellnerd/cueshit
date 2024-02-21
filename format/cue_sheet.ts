@@ -43,7 +43,7 @@ export const formatCueSheet: CueSheetFormatter = function (cueSheet) {
   return [
     command("TITLE", cueSheet.title),
     command("PERFORMER", cueSheet.performer),
-    command("FILE", cueSheet.mediaFile, "WAVE"),
+    command("FILE", cueSheet.mediaFile ?? "unknown.wav", "WAVE"),
     ...cueSheet.cues.map(formatCue),
   ].filter(isDefined).join("\n");
 };
