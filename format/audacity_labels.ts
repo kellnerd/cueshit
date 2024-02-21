@@ -27,7 +27,7 @@ export const parseAudacityLabels: CueSheetParser = function (lines) {
 };
 
 export default {
-  name: "Audacity Label Track",
+  name: "Audacity Label Track (TSV)",
   formatCue: formatAudacityLabel,
   parse: parseAudacityLabels,
 } as CueFormat;
