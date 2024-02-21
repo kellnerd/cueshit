@@ -1,4 +1,4 @@
-import { padNum } from './utils.ts';
+import { padNum } from "./utils.ts";
 
 /** Parses a duration in seconds from the given `m:s` or `H:m:s` string. */
 export function parseDuration(time: string): number {
@@ -9,6 +9,7 @@ export function parseDuration(time: string): number {
   );
 }
 
+/** Time units which are used by the duration formatter. */
 export enum TimeUnit {
   subSeconds = -1,
   seconds = 0,
@@ -16,18 +17,38 @@ export enum TimeUnit {
   hours = 2,
 }
 
+/** Time value and its unit. */
 interface DurationUnit {
   value: number;
   unit: TimeUnit;
 }
 
-export function getDurationFormatter({
-  largestUnit = TimeUnit.hours,
-  smallestUnit = TimeUnit.seconds,
-  subSecondUnits = 0, // 1000 for ms, 75 for cue sheet frames
-  subSecondSeparator = ".",
-  padLargestUnit = false,
-} = {}) {
+/** Specification of a duration format. */
+export interface DurationFormat {
+  /** Largest time unit which is displayed, defaults to hours. */
+  largestUnit: TimeUnit;
+  /** Smallest time unit which is displayed, defaults to seconds. */
+  smallestUnit: TimeUnit;
+  /** Total count of units a second is divided into (default: 0). */
+  subSecondUnits: number;
+  /** Separate seconds and sub-second units by something else than a dot. */
+  subSecondSeparator: string;
+  /** Largest unit should be zero-padded, disabled by default. */
+  padLargestUnit: boolean;
+}
+
+/**
+ * Creates a function which formats a duration according to the given format.
+ * @returns Function which formats a duration in seconds.
+ */
+export function getDurationFormatter(format: Partial<DurationFormat> = {}) {
+  const {
+    largestUnit = TimeUnit.hours,
+    smallestUnit = TimeUnit.seconds,
+    subSecondUnits = 0,
+    subSecondSeparator = ".",
+    padLargestUnit = false,
+  } = format;
   const unitWidth = 2;
   const subSecondWidth = (subSecondUnits - 1).toFixed().length;
 
@@ -52,6 +73,11 @@ export function getDurationFormatter({
   };
 }
 
+/**
+ * Converts a duration in seconds into an array of balanced time units.
+ * Balances all units except for the specified largest unit.
+ * Sub-seconds are handled according to the specified total count of sub-second units.
+ */
 function toDurationUnits(seconds: number, {
   largestUnit = TimeUnit.hours,
   subSecondUnits = 0,
