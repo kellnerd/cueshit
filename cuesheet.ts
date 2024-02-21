@@ -1,23 +1,38 @@
+/** Representation of a cue (aka chapter / track). */
 export interface Cue {
+  /** Position of the cue in a list. */
   position: number;
+  /** Title of the cue. */
   title: string;
+  /** Time offset of the cue in seconds. */
   timeOffset: number;
+  /** Performer of the title. */
   performer?: string;
+  /** Duration of the cue in seconds. */
   duration?: number;
 }
 
+/** Function which serializes a cue into a string. */
 export type CueFormatter = (cue: Cue) => string;
 
+/** Representation of a cue sheet, a list of cues. */
 export interface CueSheet {
+  /** List of cues, ordered by time offset. */
   cues: Cue[];
+  /** Title of the cue sheet. */
   title?: string;
+  /** Performer of the cue sheet. */
   performer?: string;
+  /** Path to a media file to which the time offsets relate. */
   mediaFile?: string;
+  /** Total duration of the media file. */
   duration?: number;
 }
 
+/** Function which serializes a cue sheet into a string. */
 export type CueSheetFormatter = (cueSheet: CueSheet) => string;
 
+/** Function which extracts a cue sheet from a string. */
 export type CueSheetParser = (input: string) => CueSheet;
 
 /** Specification of a cue format. */
