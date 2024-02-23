@@ -45,6 +45,14 @@ Lines which do not start with a timestamp will be skipped.
 3. Final Title (?:??)
 ```
 
+Create a cue sheet (`test.cue`) from an Audacity label track (`labels.txt`) which belongs to the audio from `test.flac`:
+
+```sh
+cueshit -f audacity labels.txt -t cue -o test.cue --sheet.media-file test.flac
+```
+
+Additional cue sheet properties can be specified via the `--sheet.title` and `--sheet.performer` options.
+
 ## Supported Formats
 
 Not all formats are supported as both input and output format (currently).
