@@ -16,9 +16,22 @@ Display the integrated help to learn how to use the CLI:
 cueshit --help
 ```
 
+The basic command to convert from one format to another looks as follows:
+
+```sh
+cueshit [input-path] --from <format> --to <format>
+```
+
+See the sections below for [examples](#examples) and an overview of the [supported formats](#supported-formats).
+
+> [!NOTE]
+> Currently the input (`--from` or `-f`) and output (`--to` or `-t`) format options are mandatory for conversion.
+> Future versions of the CLI might be able to automatically detect input and output format based on file extensions and/or content.
+
 ### Examples
 
-Convert chapters from a YouTube description into a MusicBrainz track parser listing:
+Convert chapters from a YouTube description into a MusicBrainz track parser listing.
+Input is read from standard input (via `cat`), output is written to standard output (by default):
 
 ```
 $ cat << --- | cueshit --from youtube --to musicbrainz
