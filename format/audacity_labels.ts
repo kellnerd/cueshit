@@ -1,11 +1,15 @@
-import type { CueFormat, CueFormatter, CueSheetParser } from "../cuesheet.ts";
-import { isDefined } from '../utils.ts';
+import {
+  type CueFormat,
+  type CueFormatter,
+  type CueSheetParser,
+  defaultCueDuration,
+} from "../cuesheet.ts";
+import { isDefined } from "../utils.ts";
 
 export const formatAudacityLabel: CueFormatter = function (cue) {
-  const defaultDuration = 1;
   return [
     cue.timeOffset,
-    cue.timeOffset + (cue.duration ?? defaultDuration),
+    cue.timeOffset + (cue.duration ?? defaultCueDuration),
     cue.title,
   ].join("\t");
 };

@@ -1,26 +1,26 @@
 import { stringify as stringifyCsv } from "https://deno.land/std@0.210.0/csv/stringify.ts";
 import { parse as parseCsv } from "https://deno.land/std@0.210.0/csv/parse.ts";
-import type {
-  CueFormat,
-  CueSheetFormatter,
-  CueSheetParser,
+import {
+  type CueFormat,
+  type CueSheetFormatter,
+  type CueSheetParser,
+  defaultCueDuration,
 } from "../cuesheet.ts";
 import { isDefined } from "../utils.ts";
 
 export const formatLosslessCutCsv: CueSheetFormatter = function (cueSheet) {
-  const defaultDuration = 1;
   return stringifyCsv(
     cueSheet.cues.map((cue) => [
       cue.timeOffset,
-      cue.timeOffset + (cue.duration ?? defaultDuration),
+      cue.timeOffset + (cue.duration ?? defaultCueDuration),
       cue.title,
     ]),
     { headers: false },
   );
 };
 
-export const parseLosslessCutCsv: CueSheetParser = function (lines) {
-  const segments = parseCsv(lines, { columns: ["start", "end", "label"] });
+export const parseLosslessCutCsv: CueSheetParser = function (csv) {
+  const segments = parseCsv(csv, { columns: ["start", "end", "label"] });
   return {
     cues: segments.map((segment, index) => {
       const timeOffset = parseFloat(segment.start);

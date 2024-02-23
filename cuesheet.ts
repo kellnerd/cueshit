@@ -4,16 +4,22 @@ export interface Cue {
   position: number;
   /** Title of the cue. */
   title: string;
-  /** Time offset of the cue in seconds. */
+  /** Time offset of the cue (in seconds). */
   timeOffset: number;
   /** Performer of the title. */
   performer?: string;
-  /** Duration of the cue in seconds. */
+  /** Duration of the cue (in seconds). */
   duration?: number;
 }
 
 /** Function which serializes a cue into a string. */
 export type CueFormatter = (cue: Cue) => string;
+
+/**
+ * Fallback value for the duration of a cue (in seconds).
+ * While the duration is generally optional, some output formats require it.
+ */
+export const defaultCueDuration = 1;
 
 /** Representation of a cue sheet, a list of cues. */
 export interface CueSheet {
