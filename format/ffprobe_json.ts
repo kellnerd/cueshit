@@ -1,5 +1,4 @@
 import { type CueFormat, type CueSheetParser } from "../cuesheet.ts";
-import { isDefined } from "../utils.ts";
 
 /** Metadata as returned by the ffprobe JSON writer (incomplete). */
 export interface FFMetadata {
@@ -59,16 +58,15 @@ export const parseFfprobeJson: CueSheetParser = function (input) {
     mediaFile: format?.filename,
     duration: format ? parseFloat(format.duration) : undefined,
     cues: chapters?.map((chapter, index) => {
-      if (chapter.time_base !== "1/1000") return;
-      const startTime = chapter.start / 1000;
-      const endTime = chapter.end / 1000;
+      const startTime = parseFloat(chapter.start_time);
+      const endTime = parseFloat(chapter.end_time);
       return {
         position: index + 1,
         title: chapter.tags.title,
         timeOffset: startTime,
         duration: endTime - startTime,
       };
-    }).filter(isDefined) ?? [],
+    }) ?? [],
   };
 };
 
