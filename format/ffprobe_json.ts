@@ -73,7 +73,7 @@ export interface FFChapter {
 }
 
 /** Parses the output of the ffprobe JSON writer. */
-export const parseFfprobeJson: CueSheetParser = function (input) {
+export const parseFFProbeJson: CueSheetParser = function (input) {
   const { format, streams, chapters } = JSON.parse(input) as FFMetadata;
   // Tags are either stored as format property or as stream property.
   const tags = format?.tags ?? streams?.find((stream) => stream.tags)?.tags ??
@@ -99,5 +99,5 @@ export const parseFfprobeJson: CueSheetParser = function (input) {
 
 export default {
   name: "ffprobe Metadata with Chapters (JSON)",
-  parse: parseFfprobeJson,
+  parse: parseFFProbeJson,
 } as CueFormat;
