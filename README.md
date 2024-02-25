@@ -45,10 +45,17 @@ Lines which do not start with a timestamp will be skipped.
 3. Final Title (?:??)
 ```
 
-Create a cue sheet (`test.cue`) from an Audacity label track (`labels.txt`) which belongs to the audio from `test.flac`:
+Extract chapters from a FLAC audio file using [ffprobe] and store them as a cue sheet (`test.cue`):
 
 ```sh
-cueshit -f audacity labels.txt -t cue -o test.cue --sheet.media-file test.flac
+ffprobe -v error -of json -show_chapters test.flac | cueshit -f ffprobe -t cue -o test.cue
+```
+
+Create a cue sheet from an Audacity label track (`labels.txt`) which belongs to the audio from `test.wav`.
+Since the input format only contains chapters and does not know about the audio file, it has to be specified manually:
+
+```sh
+cueshit -f audacity labels.txt -t cue -o test.cue --sheet.media-file test.wav
 ```
 
 Additional cue sheet properties can be specified via the `--sheet.title` and `--sheet.performer` options.
@@ -60,8 +67,9 @@ Not all formats are supported as both input and output format (currently).
 ```
 ID           Name                                             Input  Output
 -----------  -----------------------------------------------  -----  ------
-audacity     Audacity Label Track (TSV)                         X      X   
-cue          Cue Sheet                                                 X   
+audacity     Audacity Label Track (TSV)                         X      X
+cue          Cue Sheet                                                 X
+ffprobe      ffprobe Metadata with Chapters (JSON)              X
 losslesscut  LosslessCut Segments (CSV)                         X      X
 musicbrainz  MusicBrainz Track Parser Listing                   X      X
 ogm          OGM Tools Chapters / MKVToolNix Simple Chapters           X
@@ -75,3 +83,4 @@ cueshit formats
 ```
 
 [Deno]: https://deno.com/
+[ffprobe]: https://ffmpeg.org/ffprobe.html
