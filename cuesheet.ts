@@ -31,7 +31,7 @@ export interface CueSheet {
   performer?: string;
   /** Path to a media file to which the time offsets relate. */
   mediaFile?: string;
-  /** Total duration of the media file. */
+  /** Total duration of the media file (in seconds). */
   duration?: number;
 }
 

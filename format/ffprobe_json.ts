@@ -3,7 +3,34 @@ import { isDefined } from "../utils.ts";
 
 /** Metadata as returned by the ffprobe JSON writer (incomplete). */
 export interface FFMetadata {
+  /** Information about the container format. */
+  format?: FFFormat;
+  /** Embedded chapters. */
   chapters?: FFChapter[];
+}
+
+/** Container format information as returned by the ffprobe JSON writer. */
+export interface FFFormat {
+  /** Name of the file (with extension). */
+  filename: string;
+  /** Number of streams in the file. */
+  nb_streams: number;
+  /** Number of programs in the file. */
+  nb_programs: number;
+  /** Short name of the format, might be a comma separated list. */
+  format_name: string;
+  /** Display name of the format, might be separated by spaced slashes. */
+  format_long_name: string;
+  /** Start time in seconds (6 decimal places). */
+  start_time: string;
+  /** Duration in seconds (6 decimal places). */
+  duration: string;
+  /** File size (in bytes). */
+  size: string;
+  /** Bit rate (in bps). */
+  bit_rate: string;
+  /** TODO: Integer, probably always 100? */
+  probe_score: number;
 }
 
 /** Chapter as returned by the ffprobe JSON writer. */
@@ -27,9 +54,11 @@ export interface FFChapter {
 
 /** Parses the output of the ffprobe JSON writer. */
 export const parseFfprobeJson: CueSheetParser = function (input) {
-  const metadata: FFMetadata = JSON.parse(input);
+  const {format, chapters} = JSON.parse(input) as FFMetadata;
   return {
-    cues: metadata.chapters?.map((chapter, index) => {
+    mediaFile: format?.filename,
+    duration: format ? parseFloat(format.duration) : undefined,
+    cues: chapters?.map((chapter, index) => {
       if (chapter.time_base !== "1/1000") return;
       const startTime = chapter.start / 1000;
       const endTime = chapter.end / 1000;
