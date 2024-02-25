@@ -4,6 +4,8 @@ import { type CueFormat, type CueSheetParser } from "../cuesheet.ts";
 export interface FFMetadata {
   /** Information about the container format. */
   format?: FFFormat;
+  /** Information about the streams inside the container. */
+  streams?: FFStream[];
   /** Embedded chapters. */
   chapters?: FFChapter[];
 }
@@ -30,6 +32,25 @@ export interface FFFormat {
   bit_rate: string;
   /** TODO: Integer, probably always 100? */
   probe_score: number;
+  /** Metadata tags. */
+  tags?: Record<string, string | undefined>;
+}
+
+/** Stream information as returned by the ffprobe JSON writer (incomplete). */
+export interface FFStream {
+  index: number;
+  /** Short name of the codec. */
+  codec_name: string;
+  /** Display name of the codec. */
+  codec_long_name: string;
+  /** Type of the codec. */
+  codec_type: "video" | "audio" | "subtitle" | "data";
+  /** Start time in seconds (6 decimal places). */
+  start_time: string;
+  /** Duration in seconds (6 decimal places). */
+  duration: string;
+  /** Metadata tags. */
+  tags?: Record<string, string | undefined>;
 }
 
 /** Chapter as returned by the ffprobe JSON writer. */
@@ -53,8 +74,14 @@ export interface FFChapter {
 
 /** Parses the output of the ffprobe JSON writer. */
 export const parseFfprobeJson: CueSheetParser = function (input) {
-  const {format, chapters} = JSON.parse(input) as FFMetadata;
+  const { format, streams, chapters } = JSON.parse(input) as FFMetadata;
+  // Tags are either stored as format property or as stream property.
+  const tags = format?.tags ?? streams?.find((stream) => stream.tags)?.tags ??
+    {};
+
   return {
+    title: tags.title,
+    performer: tags.artist,
     mediaFile: format?.filename,
     duration: format ? parseFloat(format.duration) : undefined,
     cues: chapters?.map((chapter, index) => {
