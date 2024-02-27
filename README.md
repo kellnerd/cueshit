@@ -2,6 +2,8 @@
 
 Convert between different cue sheet / chapter / tracklist formats.
 
+Each supported input format is parsed into an [internal representation] which can be serialized into a supported output format.
+
 ## Usage
 
 Install the command line app (once [Deno] is set up on your computer):
@@ -70,6 +72,7 @@ ID           Name                                             Input  Output
 audacity     Audacity Label Track (TSV)                         X      X
 cue          Cue Sheet                                                 X
 ffprobe      ffprobe Metadata with Chapters (JSON)              X
+internal     Internal Representation (JSON)                            X
 losslesscut  LosslessCut Segments (CSV)                         X      X
 musicbrainz  MusicBrainz Track Parser Listing                   X      X
 ogm          OGM Tools Chapters / MKVToolNix Simple Chapters           X
@@ -83,4 +86,5 @@ cueshit formats
 ```
 
 [Deno]: https://deno.com/
+[internal representation]: https://deno.land/x/cueshit/cuesheet.ts?s=CueSheet
 [ffprobe]: https://ffmpeg.org/ffprobe.html
