@@ -97,17 +97,17 @@ export const cli = new Command()
   .action(() => {
     const supported = (value: unknown) => value ? "X" : "";
     new Table()
-      .header(["ID", "Name", "Input", "Output", "Extensions"].map(bold))
+      .header(["ID", "Input", "Output", "Name", "Extensions"].map(bold))
       .body(
         Object.entries(formats).map(([id, format]) => [
           yellow(id),
-          format.name,
           supported(format.parse),
           supported(format.format ?? format.formatCue),
+          format.name,
           format.fileExtensions?.join(" "),
         ]),
       )
-      .columns([{}, {}, { align: "center" }, { align: "center" }])
+      .columns([{}, { align: "center" }, { align: "center" }])
       .padding(2)
       .render();
   });

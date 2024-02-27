@@ -68,16 +68,16 @@ Not all formats are supported as both input and output format (currently).
 You can read the documentation for all formats inside their [modules](https://deno.land/x/cueshit/format).
 
 ```
-ID           Name                                             Input  Output
------------  -----------------------------------------------  -----  ------
-audacity     Audacity Label Track (TSV)                         X      X
-cue          Cue Sheet                                                 X
-ffprobe      ffprobe Metadata with Chapters (JSON)              X
-internal     Internal Representation (JSON)                            X
-losslesscut  LosslessCut Segments (CSV)                         X      X
-musicbrainz  MusicBrainz Track Parser Listing                   X      X
-ogm          OGM Tools Chapters / MKVToolNix Simple Chapters           X
-youtube      Youtube Description with Chapters                  X      X
+ID           Input  Output  Name
+-----------  -----  ------  -----------------------------------------------
+audacity       X      X     Audacity Label Track (TSV)
+cue                   X     Cue Sheet
+ffprobe        X            ffprobe Metadata with Chapters (JSON)
+internal              X     Internal Representation (JSON)
+losslesscut    X      X     LosslessCut Segments (CSV)
+musicbrainz    X      X     MusicBrainz Track Parser Listing
+ogm                   X     OGM Tools Chapters / MKVToolNix Simple Chapters
+youtube        X      X     Youtube Description with Chapters
 ```
 
 List all formats which are currently available for the CLI:
