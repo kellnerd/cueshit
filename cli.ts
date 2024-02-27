@@ -42,6 +42,7 @@ export const cli = new Command()
       ? Deno.readTextFile(inputPath)
       : toText(Deno.stdin.readable));
 
+    // Parse input, detect format if not specified.
     let cueSheet: CueSheet | undefined;
     if (options.from) {
       // Specified input format is guaranteed to be supported (cliffy EnumType).
@@ -51,17 +52,18 @@ export const cli = new Command()
       if (result) {
         cueSheet = result.cueSheet;
       } else {
-        throw new ValidationError("Unsupported input format");
+        throw new ValidationError("Unsupported input format.");
       }
     }
 
+    // Set the values of cue sheet properties via CLI options.
     for (const [key, value] of Object.entries(options.sheet ?? {})) {
       if (key === "title" || key === "performer" || key === "mediaFile") {
         cueSheet[key] = value;
       } else if (key === "duration") {
         cueSheet[key] = parseFloat(value!);
       } else {
-        throw new ValidationError(`Cue sheets have no "${key}" property`);
+        throw new ValidationError(`Cue sheets have no "${key}" property.`);
       }
     }
 
