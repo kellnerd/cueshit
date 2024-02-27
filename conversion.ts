@@ -1,5 +1,5 @@
 import type { CueSheet } from "./cuesheet.ts";
-import { type CueFormatId, formats } from "./formats.ts";
+import { type CueFormatId, formats, inputFormatIds } from "./formats.ts";
 
 /**
  * Parses a cue sheet with the given format.
@@ -13,6 +13,39 @@ export function parseCueSheet(
   formatId: CueFormatId,
 ): CueSheet | undefined {
   return formats[formatId].parse?.(content);
+}
+
+/** Result of a cue sheet format detection. */
+export interface DetectionResult {
+  /** Parsed cue sheet. */
+  cueSheet: CueSheet;
+  /** ID of the detected format which was successfully parsed. */
+  formatId: CueFormatId;
+}
+
+/**
+ * Detects the format of the given cue sheet and parses it.
+ *
+ * Tries to parse the serialized content with all supported input formats.
+ * Exits as soon as a parser was successful and returned a non-empty cue sheet.
+ *
+ * @param content Serialized content of the cue sheet.
+ * @returns Parsed cue sheet and its format ID or `undefined` if detection failed.
+ */
+export function detectFormatAndParseCueSheet(
+  content: string,
+): DetectionResult | undefined {
+  let cueSheet: CueSheet | undefined;
+  for (const formatId of inputFormatIds) {
+    try {
+      cueSheet = parseCueSheet(content, formatId);
+      if (cueSheet?.cues.length) {
+        return { cueSheet, formatId };
+      }
+    } catch {
+      continue;
+    }
+  }
 }
 
 /**
