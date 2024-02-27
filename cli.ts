@@ -17,12 +17,13 @@ import { formats, inputFormatIds, outputFormatIds } from "./formats.ts";
 
 export const cli = new Command()
   .name("cueshit")
-  .version("0.3.0-dev")
+  .version("0.3.0")
   .description(`
     Convert between different cue sheet / chapter / tracklist formats.
 
     Reads from standard input if no input path is specified.
     Writes to standard output if no output path is specified.
+    Automatically tries to detect input and output format if not specified.
   `)
   .type("input-format", new EnumType(inputFormatIds))
   .type("output-format", new EnumType(outputFormatIds))
