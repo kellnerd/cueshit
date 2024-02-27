@@ -97,13 +97,14 @@ export const cli = new Command()
   .action(() => {
     const supported = (value: unknown) => value ? "X" : "";
     new Table()
-      .header(["ID", "Name", "Input", "Output"].map(bold))
+      .header(["ID", "Name", "Input", "Output", "Extensions"].map(bold))
       .body(
         Object.entries(formats).map(([id, format]) => [
           yellow(id),
-          format?.name,
-          supported(format?.parse),
-          supported(format?.format ?? format?.formatCue),
+          format.name,
+          supported(format.parse),
+          supported(format.format ?? format.formatCue),
+          format.fileExtensions?.join(" "),
         ]),
       )
       .columns([{}, {}, { align: "center" }, { align: "center" }])
