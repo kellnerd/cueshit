@@ -9,6 +9,7 @@ import { Table } from "https://deno.land/x/cliffy@v1.0.0-rc.3/table/mod.ts";
 import {
   detectFormatAndParseCueSheet,
   formatCueSheet,
+  getPossibleFormatsByExtension,
   parseCueSheet,
 } from "./conversion.ts";
 import { type CueSheet } from "./cuesheet.ts";
@@ -26,13 +27,17 @@ export const cli = new Command()
   .type("input-format", new EnumType(inputFormatIds))
   .type("output-format", new EnumType(outputFormatIds))
   .option("-f, --from <format:input-format>", "ID of the input format.")
-  .option("-t, --to <format:output-format>", "ID of the output format.", {
-    required: true,
-  })
+  .option("-t, --to <format:output-format>", "ID of the output format.")
   .option("-o, --output <path:file>", "Path to the output file.")
   .option("--sheet.* <value>", "Set the value of a cue sheet property.")
   .arguments("[input-path:file]")
   .action(async (options, inputPath) => {
+    if (!options.to && !options.output) {
+      throw new ValidationError(
+        'Missing option "--to" or "--output" to determine output format.',
+      );
+    }
+
     const input = await (inputPath
       ? Deno.readTextFile(inputPath)
       : toText(Deno.stdin.readable));
@@ -60,8 +65,24 @@ export const cli = new Command()
       }
     }
 
-    // Specified output format is guaranteed to be supported (cliffy EnumType).
-    const output = formatCueSheet(cueSheet, options.to)!;
+    // Determine output format using file extension, if not specified.
+    if (!options.to) {
+      // We have already checked above that `options.output` is specified.
+      const possibleFormats = getPossibleFormatsByExtension(options.output!);
+      if (possibleFormats.length === 1) {
+        options.to = possibleFormats[0];
+      } else {
+        throw new ValidationError(
+          `Missing option "--to", could not determine format by file extension.`,
+        );
+      }
+    }
+
+    // Try to format output.
+    const output = formatCueSheet(cueSheet, options.to);
+    if (!output) {
+      throw new ValidationError(`No formatter for "${options.to}" exists.`);
+    }
 
     if (options.output) {
       await Deno.writeTextFile(options.output, output);
