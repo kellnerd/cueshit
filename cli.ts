@@ -110,6 +110,6 @@ export const cli = new Command()
       .render();
   });
 
-if (import.meta.main && Deno.args.length) {
+if (import.meta.main) {
   await cli.parse();
 }
