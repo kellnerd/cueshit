@@ -1,3 +1,19 @@
+/**
+ * Cue sheet file which describes the track layout of an audio CD.
+ *
+ * Supported commands: `FILE`, `TRACK`, `INDEX`, `TITLE` and `PERFORMER`
+ *
+ * ```cue
+ * FILE test.wav WAVE
+ *   TRACK 01 AUDIO
+ *     TITLE "Test Title"
+ *     INDEX 01 00:00:00
+ *   TRACK 02 AUDIO
+ *     TITLE "Another Title"
+ *     INDEX 01 02:56:42
+ * ```
+ */
+
 import type {
   CueFormat,
   CueFormatter,
@@ -14,6 +30,7 @@ const formatTimestamp = getDurationFormatter({
   subSecondUnits: 75, // frames
 });
 
+/** Serializes a cue sheet command if all its values are defined. */
 function command(name: string, ...values: Array<string | number | undefined>) {
   if (values.every(isDefined)) {
     return `${name} ${
@@ -29,6 +46,7 @@ function command(name: string, ...values: Array<string | number | undefined>) {
   }
 }
 
+/** Formats the commands for a single cue. */
 export const formatCue: CueFormatter = function (cue) {
   const trackNumber = padNum(cue.position, 2);
   return [
@@ -39,6 +57,7 @@ export const formatCue: CueFormatter = function (cue) {
   ].filter(isDefined).join("\n");
 };
 
+/** Formats the commands for a cue sheet. */
 export const formatCueSheet: CueSheetFormatter = function (cueSheet) {
   return [
     command("TITLE", cueSheet.title),

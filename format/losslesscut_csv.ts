@@ -1,3 +1,18 @@
+/**
+ * [LosslessCut] segments, exported in the LosslessCut CSV format.
+ *
+ * Each row contains one segment with three columns for start time, end time
+ * (both expressed in seconds or empty) and label:
+ *
+ * ```csv
+ * ,56.9568,First segment starting at 0
+ * 70,842.33,"Another quoted label"
+ * 1234,,Last segment
+ * ```
+ *
+ * [LosslessCut]: https://github.com/mifi/lossless-cut
+ */
+
 import { stringify as stringifyCsv } from "https://deno.land/std@0.210.0/csv/stringify.ts";
 import { parse as parseCsv } from "https://deno.land/std@0.210.0/csv/parse.ts";
 import {
@@ -8,6 +23,7 @@ import {
 } from "../cuesheet.ts";
 import { isDefined } from "../utils.ts";
 
+/** Formats cues as LosslessCut CSV document. */
 export const formatLosslessCutCsv: CueSheetFormatter = function (cueSheet) {
   return stringifyCsv(
     cueSheet.cues.map((cue) => [
@@ -19,6 +35,7 @@ export const formatLosslessCutCsv: CueSheetFormatter = function (cueSheet) {
   );
 };
 
+/** Parses a LosslessCut CSV document into cues. */
 export const parseLosslessCutCsv: CueSheetParser = function (csv) {
   const segments = parseCsv(csv, { columns: ["start", "end", "label"] });
   return {

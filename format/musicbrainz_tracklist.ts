@@ -1,3 +1,19 @@
+/**
+ * Track listing which is understood by the [MusicBrainz] [track parser].
+ *
+ * Each line represents one track and includes an optional track number, title,
+ * an optional artist and the duration of the track (which might be unknown).
+ *
+ * ```
+ * 1. Test Title - Performer (2:56)
+ * 2. Another Title (without performer) (1:21)
+ * 3. Final Title (with unknown duration) (?:??)
+ * ```
+ *
+ * [MusicBrainz]: https://musicbrainz.org/
+ * [track parser]: https://wiki.musicbrainz.org/How_to_Add_a_Release#The_Track_Parser_.28Manual_entry.29
+ */
+
 import type {
   Cue,
   CueFormat,
@@ -10,12 +26,15 @@ const formatDuration = getDurationFormatter({
   largestUnit: TimeUnit.minutes,
 });
 
+/** Formats a line with a track for the MusicBrainz track parser. */
 export const formatMusicBrainzTrack: CueFormatter = function (cue) {
+  // TODO: Include performer (if known)
   return `${cue.position}. ${cue.title} (${
     formatDuration(cue.duration) ?? "?:??"
   })`;
 };
 
+/** Parses a MusicBrainz track parser listing into cues. */
 export const parseMusicBrainzTrackListing: CueSheetParser = function (listing) {
   const trackPattern =
     /((?<position>\d+)?\.\s+)?(?<title>.+)\s+\((?<duration>\d+:\d{2})\)/;

@@ -1,3 +1,17 @@
+/**
+ * Metadata as returned by the [ffprobe] JSON writer.
+ *
+ * ffprobe is part of the FFmpeg multimedia framework and can extract
+ * information from various multimedia formats.
+ *
+ * Mandatory ffprobe options: `-of json` and `-show_chapters`
+ *
+ * In order to extract additional metadata (like media filename and tags),
+ * the `-show_format` and `-show_streams` options should also be specified.
+ *
+ * [ffprobe]: https://ffmpeg.org/ffprobe.html
+ */
+
 import { type CueFormat, type CueSheetParser } from "../cuesheet.ts";
 
 /** Metadata as returned by the ffprobe JSON writer (incomplete). */

@@ -65,6 +65,7 @@ Additional cue sheet properties can be specified via the `--sheet.title` and `--
 ## Supported Formats
 
 Not all formats are supported as both input and output format (currently).
+You can read the documentation for all formats inside their [modules](https://deno.land/x/cueshit/format).
 
 ```
 ID           Name                                             Input  Output
