@@ -6,12 +6,17 @@ import {
   ValidationError,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
 import { Table } from "https://deno.land/x/cliffy@v1.0.0-rc.3/table/mod.ts";
-import { formatCueSheet, parseCueSheet } from "./conversion.ts";
+import {
+  detectFormatAndParseCueSheet,
+  formatCueSheet,
+  parseCueSheet,
+} from "./conversion.ts";
+import { type CueSheet } from "./cuesheet.ts";
 import { formats, inputFormatIds, outputFormatIds } from "./formats.ts";
 
 export const cli = new Command()
   .name("cueshit")
-  .version("0.1.0")
+  .version("0.3.0-dev")
   .description(`
     Convert between different cue sheet / chapter / tracklist formats.
 
@@ -20,9 +25,7 @@ export const cli = new Command()
   `)
   .type("input-format", new EnumType(inputFormatIds))
   .type("output-format", new EnumType(outputFormatIds))
-  .option("-f, --from <format:input-format>", "ID of the input format.", {
-    required: true,
-  })
+  .option("-f, --from <format:input-format>", "ID of the input format.")
   .option("-t, --to <format:output-format>", "ID of the output format.", {
     required: true,
   })
@@ -34,8 +37,18 @@ export const cli = new Command()
       ? Deno.readTextFile(inputPath)
       : toText(Deno.stdin.readable));
 
-    // Specified input format is guaranteed to be supported (cliffy EnumType).
-    const cueSheet = parseCueSheet(input, options.from)!;
+    let cueSheet: CueSheet | undefined;
+    if (options.from) {
+      // Specified input format is guaranteed to be supported (cliffy EnumType).
+      cueSheet = parseCueSheet(input, options.from)!;
+    } else {
+      const result = detectFormatAndParseCueSheet(input, inputPath);
+      if (result) {
+        cueSheet = result.cueSheet;
+      } else {
+        throw new ValidationError("Unsupported input format");
+      }
+    }
 
     for (const [key, value] of Object.entries(options.sheet ?? {})) {
       if (key === "title" || key === "performer" || key === "mediaFile") {
