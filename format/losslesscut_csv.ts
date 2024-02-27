@@ -40,7 +40,7 @@ export const parseLosslessCutCsv: CueSheetParser = function (csv) {
   const segments = parseCsv(csv, { columns: ["start", "end", "label"] });
   return {
     cues: segments.map((segment, index) => {
-      const timeOffset = parseFloat(segment.start);
+      const timeOffset = parseFloat(segment.start || "0");
       if (isNaN(timeOffset)) return;
       return {
         position: index + 1,
