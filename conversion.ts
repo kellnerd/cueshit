@@ -1,5 +1,11 @@
+import { extname } from "https://deno.land/std@0.210.0/path/extname.ts";
 import type { CueSheet } from "./cuesheet.ts";
-import { type CueFormatId, formats, inputFormatIds } from "./formats.ts";
+import {
+  type CueFormatId,
+  formatIds,
+  formats,
+  inputFormatIds,
+} from "./formats.ts";
 
 /**
  * Parses a cue sheet with the given format.
@@ -71,4 +77,27 @@ export function formatCueSheet(
   } else {
     return undefined;
   }
+}
+
+/** Maps file extensions to formats which use that extension. */
+const extensionToFormatIds: Record<string, CueFormatId[]> = {};
+
+/** Returns a list of possible formats for the given extension. */
+export function getPossibleFormatsByExtension(path: string): CueFormatId[] {
+  if (!Object.keys(extensionToFormatIds).length) {
+    // Initialize file extension lookup table.
+    for (const formatId of formatIds) {
+      for (const extension of formats[formatId].fileExtensions ?? []) {
+        if (!(extension in extensionToFormatIds)) {
+          extensionToFormatIds[extension] = [formatId];
+        } else {
+          extensionToFormatIds[extension].push(formatId);
+        }
+      }
+    }
+  }
+
+  // Lookup format IDs.
+  const extension = extname(path);
+  return extensionToFormatIds[extension] ?? [];
 }
