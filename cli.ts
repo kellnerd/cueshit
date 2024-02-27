@@ -70,10 +70,16 @@ export const cli = new Command()
 
     // Determine output format using file extension, if not specified.
     if (!options.to) {
-      // We have already checked above that `options.output` is specified.
-      const possibleFormats = getPossibleFormatsByExtension(options.output!);
-      if (possibleFormats.length === 1) {
-        options.to = possibleFormats[0];
+      const possibleOutputFormats = getPossibleFormatsByExtension(
+        // We have already checked above that `options.output` is specified.
+        options.output!,
+      ).filter((format) =>
+        // Ignore irrelevant possible input formats.
+        outputFormatIds.includes(format)
+      );
+
+      if (possibleOutputFormats.length === 1) {
+        options.to = possibleOutputFormats[0];
       } else {
         throw new ValidationError(
           `Missing option "--to", could not determine format by file extension.`,
