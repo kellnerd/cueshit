@@ -71,4 +71,5 @@ export default {
   name: "Cue Sheet",
   formatCue: formatCue,
   format: formatCueSheet,
+  fileExtensions: [".cue"],
 } as CueFormat;

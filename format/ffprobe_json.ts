@@ -114,4 +114,5 @@ export const parseFFProbeJson: CueSheetParser = function (input) {
 export default {
   name: "ffprobe Metadata with Chapters (JSON)",
   parse: parseFFProbeJson,
+  fileExtensions: [".json"],
 } as CueFormat;

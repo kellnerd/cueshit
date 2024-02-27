@@ -37,4 +37,5 @@ export const formatOgmChapter: CueFormatter = function (cue) {
 export default {
   name: "OGM Tools Chapters / MKVToolNix Simple Chapters",
   formatCue: formatOgmChapter,
+  fileExtensions: [".txt"],
 } as CueFormat;

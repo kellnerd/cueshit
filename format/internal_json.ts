@@ -7,4 +7,5 @@ import type { CueFormat, CueSheet } from "../cuesheet.ts";
 export default {
   name: "Internal Representation (JSON)",
   format: (cueSheet: CueSheet) => JSON.stringify(cueSheet),
+  fileExtensions: [".json"],
 } as CueFormat;

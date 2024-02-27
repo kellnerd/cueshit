@@ -50,4 +50,5 @@ export default {
   name: "Audacity Label Track (TSV)",
   formatCue: formatAudacityLabel,
   parse: parseAudacityLabels,
+  fileExtensions: [".txt", ".tsv"],
 } as CueFormat;

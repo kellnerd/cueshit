@@ -56,4 +56,5 @@ export default {
   name: "LosslessCut Segments (CSV)",
   format: formatLosslessCutCsv,
   parse: parseLosslessCutCsv,
+  fileExtensions: [".csv"],
 } as CueFormat;

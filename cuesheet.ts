@@ -56,4 +56,8 @@ export interface CueFormat {
   format?: CueSheetFormatter;
   /** Parser which extracts a cue sheet. */
   parse?: CueSheetParser;
+  /**
+   * Standard file extension(s) of the format, in order of preference.
+   */
+  fileExtensions?: string[];
 }
