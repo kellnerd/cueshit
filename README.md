@@ -50,14 +50,14 @@ Lines which do not start with a timestamp will be skipped.
 Extract chapters from a FLAC audio file using [ffprobe] and store them as a cue sheet (`test.cue`):
 
 ```sh
-ffprobe -v error -of json -show_format -show_streams -show_chapters test.flac | cueshit -f ffprobe -t cue -o test.cue
+ffprobe -v error -of json -show_format -show_streams -show_chapters test.flac | cueshit -o test.cue
 ```
 
 Create a cue sheet from an Audacity label track (`labels.txt`) which belongs to the audio from `test.wav`.
 Since the input format only contains chapters and does not know about the audio file, it has to be specified manually:
 
 ```sh
-cueshit -f audacity labels.txt -t cue -o test.cue --sheet.media-file test.wav
+cueshit -f audacity labels.txt -o test.cue --sheet.media-file test.wav
 ```
 
 Additional cue sheet properties can be specified via the `--sheet.title` and `--sheet.performer` options.
