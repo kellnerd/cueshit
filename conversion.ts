@@ -35,14 +35,24 @@ export interface DetectionResult {
  * Tries to parse the serialized content with all supported input formats.
  * Exits as soon as a parser was successful and returned a non-empty cue sheet.
  *
+ * If a path is given, the file extension will be used to prioritize the formats
+ * which are using this file extension.
+ *
  * @param content Serialized content of the cue sheet.
+ * @param path Path to the cue sheet file (including extension).
  * @returns Parsed cue sheet and its format ID or `undefined` if detection failed.
  */
 export function detectFormatAndParseCueSheet(
   content: string,
+  path?: string,
 ): DetectionResult | undefined {
+  const prioritizedFormatIds = new Set([
+    ...(path ? getPossibleFormatsByExtension(path) : []),
+    ...inputFormatIds,
+  ]);
+
   let cueSheet: CueSheet | undefined;
-  for (const formatId of inputFormatIds) {
+  for (const formatId of prioritizedFormatIds) {
     try {
       cueSheet = parseCueSheet(content, formatId);
       if (cueSheet?.cues.length) {
