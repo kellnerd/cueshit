@@ -6,14 +6,8 @@ import {
   ValidationError,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
 import { Table } from "https://deno.land/x/cliffy@v1.0.0-rc.3/table/mod.ts";
-import formats from "./formats.ts";
-
-const inputFormatIds = Object.entries(formats)
-  .filter(([_id, format]) => format?.parse)
-  .map(([id, _format]) => id);
-const outputFormatIds = Object.entries(formats)
-  .filter(([_id, format]) => format?.format ?? format?.formatCue)
-  .map(([id, _format]) => id);
+import { formatCueSheet, parseCueSheet } from "./conversion.ts";
+import { formats, inputFormatIds, outputFormatIds } from "./formats.ts";
 
 export const cli = new Command()
   .name("cueshit")
@@ -36,31 +30,12 @@ export const cli = new Command()
   .option("--sheet.* <value>", "Set the value of a cue sheet property.")
   .arguments("[input-path:file]")
   .action(async (options, inputPath) => {
-    const inputFormat = formats[options.from];
-    const parseCueSheet = inputFormat?.parse;
-    if (!parseCueSheet) {
-      throw new ValidationError(
-        `No parser for "${inputFormat?.name ?? options.from}" exists`,
-      );
-    }
-
-    const outputFormat = formats[options.to];
-    let formatCueSheet = outputFormat?.format;
-    if (!formatCueSheet) {
-      const formatCue = outputFormat?.formatCue;
-      if (!formatCue) {
-        throw new ValidationError(
-          `No formatter for "${outputFormat?.name ?? options.to}" exists`,
-        );
-      } else {
-        formatCueSheet = (cuesheet) => cuesheet.cues.map(formatCue).join("\n");
-      }
-    }
-
     const input = await (inputPath
       ? Deno.readTextFile(inputPath)
       : toText(Deno.stdin.readable));
-    const cueSheet = parseCueSheet(input);
+
+    // Specified input format is guaranteed to be supported (cliffy EnumType).
+    const cueSheet = parseCueSheet(input, options.from)!;
 
     for (const [key, value] of Object.entries(options.sheet ?? {})) {
       if (key === "title" || key === "performer" || key === "mediaFile") {
@@ -72,7 +47,8 @@ export const cli = new Command()
       }
     }
 
-    const output = formatCueSheet(cueSheet);
+    // Specified output format is guaranteed to be supported (cliffy EnumType).
+    const output = formatCueSheet(cueSheet, options.to)!;
 
     if (options.output) {
       await Deno.writeTextFile(options.output, output);
