@@ -5,6 +5,7 @@ import cue_sheet from "./format/cue_sheet.ts";
 import ffprobe_json from "./format/ffprobe_json.ts";
 import internal_json from "./format/internal_json.ts";
 import losslesscut_csv from "./format/losslesscut_csv.ts";
+import losslesscut_project from "./format/losslesscut_project.ts";
 import musicbrainz_tracklist from "./format/musicbrainz_tracklist.ts";
 import ogm_chapters from "./format/ogm_chapters.ts";
 import youtube_description from "./format/youtube_description.ts";
@@ -15,6 +16,7 @@ export const formats = {
   "cue": cue_sheet,
   "ffprobe": ffprobe_json,
   "internal": internal_json,
+  "llc": losslesscut_project,
   "losslesscut": losslesscut_csv,
   "musicbrainz": musicbrainz_tracklist,
   "ogm": ogm_chapters,

@@ -74,6 +74,7 @@ audacity       X      X     Audacity Label Track (TSV)
 cue                   X     Cue Sheet
 ffprobe        X            ffprobe Metadata with Chapters (JSON)
 internal              X     Internal Representation (JSON)
+llc                   X     LosslessCut Project (LLC)
 losslesscut    X      X     LosslessCut Segments (CSV)
 musicbrainz    X      X     MusicBrainz Track Parser Listing
 ogm                   X     OGM Tools Chapters / MKVToolNix Simple Chapters
