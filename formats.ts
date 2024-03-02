@@ -2,6 +2,7 @@ import type { CueFormat } from "./cuesheet.ts";
 
 import audacity_labels from "./format/audacity_labels.ts";
 import cue_sheet from "./format/cue_sheet.ts";
+import ffmpeg_commands from "./format/ffmpeg_commands.ts";
 import ffprobe_json from "./format/ffprobe_json.ts";
 import internal_json from "./format/internal_json.ts";
 import losslesscut_csv from "./format/losslesscut_csv.ts";
@@ -14,6 +15,7 @@ import youtube_description from "./format/youtube_description.ts";
 export const formats = {
   "audacity": audacity_labels,
   "cue": cue_sheet,
+  "ffmpeg": ffmpeg_commands,
   "ffprobe": ffprobe_json,
   "internal": internal_json,
   "llc": losslesscut_project,
