@@ -11,7 +11,7 @@ import {
   type CueSheet,
   type CueSheetFormatter,
 } from "../cuesheet.ts";
-import { isDefined, padNum } from "../utils.ts";
+import { isDefined, padNum, quoteArgument } from "../utils.ts";
 
 /**
  * Audio file extensions for which FFmpeg treats tags as if they are stored at
@@ -84,7 +84,7 @@ export function createFFmpegArguments(cueSheet: CueSheet): string[][] {
 /** Formats a cue sheet as a series of ffmpeg chapter extraction commands. */
 export const formatFFmpegCommands: CueSheetFormatter = function (cueSheet) {
   return createFFmpegArguments(cueSheet).map((chapterArguments) =>
-    ["ffmpeg", ...chapterArguments.map((argument) => `"${argument}"`)].join(" ")
+    ["ffmpeg", ...chapterArguments.map(quoteArgument)].join(" ")
   ).join("\n");
 };
 

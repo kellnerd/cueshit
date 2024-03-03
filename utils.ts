@@ -7,3 +7,8 @@ export function isDefined<T>(value: T | undefined): value is T {
 export function padNum(value: number, maxLength: number) {
   return value.toFixed().padStart(maxLength, "0");
 }
+
+/** Wraps a command line argument in single quotes and escapes single quotes. */
+export function quoteArgument(value: string) {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
