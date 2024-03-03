@@ -19,6 +19,7 @@ import {
   inputFormatIds,
   outputFormatIds,
 } from "./formats.ts";
+import { createFFmpegArguments } from "./format/ffmpeg_commands.ts";
 import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
 /**
@@ -111,7 +112,7 @@ export async function processCueSheetInput(
 /** Cliffy command specification of the CLI. */
 export const cli = new Command()
   .name("cueshit")
-  .version("0.4.0-dev")
+  .version("0.4.0")
   .description(`
     Convert between different cue sheet / chapter / tracklist formats.
 
@@ -119,8 +120,8 @@ export const cli = new Command()
     Writes to standard output if no output path is specified.
     Automatically tries to detect input and output format if not specified.
   `)
-  .type("input-format", new EnumType(inputFormatIds))
-  .type("output-format", new EnumType(outputFormatIds))
+  .globalType("input-format", new EnumType(inputFormatIds))
+  .globalType("output-format", new EnumType(outputFormatIds))
   .option("-f, --from <format:input-format>", "ID of the input format.")
   .option("-t, --to <format:output-format>", "ID of the output format.")
   .option("-o, --output <path:file>", "Path to the output file.")
@@ -184,6 +185,39 @@ export const cli = new Command()
       .padding(2)
       .render();
   });
+
+const ffmpegStatus = await Deno.permissions.query({
+  name: "run",
+  command: "ffmpeg",
+});
+
+// Register command which relies on the permission to run ffmpeg.
+if (ffmpegStatus.state === "granted") {
+  cli
+    .command("split <input-path:file>")
+    .description(`
+      Split a media file into its chapters (using ffmpeg).
+
+      Accepts a multimedia file with embedded chapters or a cue file as input.
+      The split media files will be numbered and output into the working directory.
+    `)
+    .option("-f, --from <format:input-format>", "ID of the input format.")
+    .option("--sheet.* <value>", "Set the value of a cue sheet property.")
+    .action(async (options, inputPath) => {
+      const cueSheet = await processCueSheetInput(inputPath, options);
+      const textDecoder = new TextDecoder();
+
+      for (const args of createFFmpegArguments(cueSheet)) {
+        const ffmpeg = new Deno.Command("ffmpeg", { args });
+        const { stderr, stdout, success } = await ffmpeg.output();
+        if (success) {
+          console.log(textDecoder.decode(stdout));
+        } else {
+          console.error(textDecoder.decode(stderr));
+        }
+      }
+    });
+}
 
 if (import.meta.main) {
   await cli.parse();
