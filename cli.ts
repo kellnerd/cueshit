@@ -49,12 +49,22 @@ export const cli = new Command()
           const ffprobe = new Deno.Command("ffprobe", {
             args: [...recommendedFFProbeOptions, inputPath],
           });
-          const { stdout } = await ffprobe.output();
+          const { stderr, stdout, success } = await ffprobe.output();
           const textDecoder = new TextDecoder();
-          input = textDecoder.decode(stdout);
-          options.from = "ffprobe";
+          if (success) {
+            input = textDecoder.decode(stdout);
+            options.from = "ffprobe";
+          } else {
+            throw new ValidationError(
+              `Failed to open input with ffprobe: ${
+                textDecoder.decode(stderr)
+              }You may want to explicitly specify an input format.`,
+            );
+          }
         }
       }
+      // The (text-based) input format has explicitly been specified or we know
+      // the file extension. We want to directly read the text content.
       input ??= await Deno.readTextFile(inputPath);
     } else {
       input = await toText(Deno.stdin.readable);
