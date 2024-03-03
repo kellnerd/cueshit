@@ -13,9 +13,102 @@ import {
   parseCueSheet,
 } from "./conversion.ts";
 import { type CueSheet } from "./cuesheet.ts";
-import { formats, inputFormatIds, outputFormatIds } from "./formats.ts";
+import {
+  type CueFormatId,
+  formats,
+  inputFormatIds,
+  outputFormatIds,
+} from "./formats.ts";
 import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
+/**
+ * Creates a cue sheet from the content at the given input path.
+ *
+ * - Automatically tries to detect format from file extension if not specified.
+ * - Tries to call ffprobe for (multimedia) files with an unknown extension.
+ * - If the extension is ambiguous, all parsers will be tried until success.
+ *
+ * @param inputPath Path to the input, falls back to standard input.
+ * @param options Source format and additional cue sheet properties.
+ */
+export async function processCueSheetInput(
+  inputPath: string | undefined,
+  options: {
+    from?: CueFormatId;
+    sheet?: Record<string, string | undefined>;
+  },
+): Promise<CueSheet> {
+  let input: string;
+  if (inputPath) {
+    if (!options.from) {
+      const possibleFormatIds = getPossibleFormatsByExtension(inputPath);
+      // We do not know the extension, so we expect a multimedia file.
+      if (!possibleFormatIds.length) {
+        // Fail if ffprobe permission has not been configured.
+        const ffprobeStatus = await Deno.permissions.query({
+          name: "run",
+          command: "ffprobe",
+        });
+        if (ffprobeStatus.state !== "granted") {
+          throw new ValidationError(
+            "Unknown input file extension, please specify an input format.",
+          );
+        }
+
+        // If the CLI has the permission to call ffprobe, we try to do that.
+        const ffprobe = new Deno.Command("ffprobe", {
+          args: [...recommendedFFProbeOptions, inputPath],
+        });
+        const { stderr, stdout, success } = await ffprobe.output();
+        const textDecoder = new TextDecoder();
+        if (success) {
+          input = textDecoder.decode(stdout);
+          options.from = "ffprobe";
+        } else {
+          throw new ValidationError(
+            `Failed to open input with ffprobe: ${
+              textDecoder.decode(stderr)
+            }You may want to explicitly specify an input format.`,
+          );
+        }
+      }
+    }
+    // The (text-based) input format has explicitly been specified or we know
+    // the file extension. We want to directly read the text content.
+    input ??= await Deno.readTextFile(inputPath);
+  } else {
+    input = await toText(Deno.stdin.readable);
+  }
+
+  // Parse input, detect format if not specified.
+  let cueSheet: CueSheet | undefined;
+  if (options.from) {
+    // Specified input format is guaranteed to be supported (cliffy EnumType).
+    cueSheet = parseCueSheet(input, options.from)!;
+  } else {
+    const result = detectFormatAndParseCueSheet(input, inputPath);
+    if (result) {
+      cueSheet = result.cueSheet;
+    } else {
+      throw new ValidationError("Unsupported input format.");
+    }
+  }
+
+  // Set the values of cue sheet properties via CLI options.
+  for (const [key, value] of Object.entries(options.sheet ?? {})) {
+    if (key === "title" || key === "performer" || key === "mediaFile") {
+      cueSheet[key] = value;
+    } else if (key === "duration") {
+      cueSheet[key] = parseFloat(value!);
+    } else {
+      throw new ValidationError(`Cue sheets have no "${key}" property.`);
+    }
+  }
+
+  return cueSheet;
+}
+
+/** Cliffy command specification of the CLI. */
 export const cli = new Command()
   .name("cueshit")
   .version("0.4.0-dev")
@@ -40,72 +133,7 @@ export const cli = new Command()
       );
     }
 
-    let input: string;
-    if (inputPath) {
-      if (!options.from) {
-        const possibleFormatIds = getPossibleFormatsByExtension(inputPath);
-        // We do not know the extension, so we expect a multimedia file.
-        if (!possibleFormatIds.length) {
-          // Fail if ffprobe permission has not been configured.
-          const ffprobeStatus = await Deno.permissions.query({
-            name: "run",
-            command: "ffprobe",
-          });
-          if (ffprobeStatus.state !== "granted") {
-            throw new ValidationError(
-              "Unknown input file extension, please specify an input format.",
-            );
-          }
-
-          // If the CLI has the permission to call ffprobe, we try to do that.
-          const ffprobe = new Deno.Command("ffprobe", {
-            args: [...recommendedFFProbeOptions, inputPath],
-          });
-          const { stderr, stdout, success } = await ffprobe.output();
-          const textDecoder = new TextDecoder();
-          if (success) {
-            input = textDecoder.decode(stdout);
-            options.from = "ffprobe";
-          } else {
-            throw new ValidationError(
-              `Failed to open input with ffprobe: ${
-                textDecoder.decode(stderr)
-              }You may want to explicitly specify an input format.`,
-            );
-          }
-        }
-      }
-      // The (text-based) input format has explicitly been specified or we know
-      // the file extension. We want to directly read the text content.
-      input ??= await Deno.readTextFile(inputPath);
-    } else {
-      input = await toText(Deno.stdin.readable);
-    }
-
-    // Parse input, detect format if not specified.
-    let cueSheet: CueSheet | undefined;
-    if (options.from) {
-      // Specified input format is guaranteed to be supported (cliffy EnumType).
-      cueSheet = parseCueSheet(input, options.from)!;
-    } else {
-      const result = detectFormatAndParseCueSheet(input, inputPath);
-      if (result) {
-        cueSheet = result.cueSheet;
-      } else {
-        throw new ValidationError("Unsupported input format.");
-      }
-    }
-
-    // Set the values of cue sheet properties via CLI options.
-    for (const [key, value] of Object.entries(options.sheet ?? {})) {
-      if (key === "title" || key === "performer" || key === "mediaFile") {
-        cueSheet[key] = value;
-      } else if (key === "duration") {
-        cueSheet[key] = parseFloat(value!);
-      } else {
-        throw new ValidationError(`Cue sheets have no "${key}" property.`);
-      }
-    }
+    const cueSheet = await processCueSheetInput(inputPath, options);
 
     // Determine output format using file extension, if not specified.
     if (!options.to) {
