@@ -12,6 +12,14 @@ Install the command line app (once [Deno] is set up on your computer):
 deno install --allow-read --allow-write https://deno.land/x/cueshit/cli.ts
 ```
 
+If you have installed [FFmpeg], you can alternatively install the CLI with enabled FFmpeg integration:
+
+```sh
+deno install --allow-run=ffprobe --allow-read --allow-write https://deno.land/x/cueshit/cli.ts
+```
+
+This allows you to read embedded chapters directly from multimedia files using [ffprobe].
+
 Display the integrated help to learn how to use the CLI:
 
 ```sh
@@ -53,6 +61,12 @@ Extract chapters from a FLAC audio file using [ffprobe] and store them as a cue 
 ffprobe -v error -of json -show_format -show_streams -show_chapters test.flac | cueshit -o test.cue
 ```
 
+If you have enabled the FFmpeg integration during installation, the above command can be simplified to (since v0.4):
+
+```sh
+cueshit test.flac --output test.cue
+```
+
 Create a cue sheet from an Audacity label track (`labels.txt`) which belongs to the audio from `test.wav`.
 Since the input format only contains chapters and does not know about the audio file, it has to be specified manually:
 
@@ -72,6 +86,7 @@ ID           Input  Output  Name
 -----------  -----  ------  -----------------------------------------------
 audacity       X      X     Audacity Label Track (TSV)
 cue                   X     Cue Sheet
+ffmpeg                X     FFmpeg Split Commands
 ffprobe        X            ffprobe Metadata with Chapters (JSON)
 internal              X     Internal Representation (JSON)
 llc                   X     LosslessCut Project (LLC)
@@ -89,4 +104,5 @@ cueshit formats
 
 [Deno]: https://deno.com/
 [internal representation]: https://deno.land/x/cueshit/cuesheet.ts?s=CueSheet
+[FFmpeg]: https://ffmpeg.org/
 [ffprobe]: https://ffmpeg.org/ffprobe.html
