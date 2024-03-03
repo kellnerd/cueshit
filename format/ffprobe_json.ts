@@ -111,6 +111,15 @@ export const parseFFProbeJson: CueSheetParser = function (input) {
   };
 };
 
+/** Recommended ffprobe CLI options to produce the desired JSON output. */
+export const recommendedFFProbeOptions = [
+  "-v error",
+  "-of json",
+  "-show_format",
+  "-show_streams",
+  "-show_chapters",
+];
+
 export default {
   name: "ffprobe Metadata with Chapters (JSON)",
   parse: parseFFProbeJson,
