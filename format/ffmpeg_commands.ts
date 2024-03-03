@@ -6,7 +6,11 @@
 
 import { assert } from "https://deno.land/std@0.210.0/assert/assert.ts";
 import { extname } from "https://deno.land/std@0.210.0/path/extname.ts";
-import { type CueFormat, type CueSheetFormatter } from "../cuesheet.ts";
+import {
+  type CueFormat,
+  type CueSheet,
+  type CueSheetFormatter,
+} from "../cuesheet.ts";
 import { isDefined, padNum } from "../utils.ts";
 
 /**
@@ -22,8 +26,12 @@ const tagsAtStreamLevelExtensions = new Set([
   ".opus",
 ]);
 
-/** Formats cues as a series of ffmpeg chapter extraction commands. */
-export const formatFFmpegCommands: CueSheetFormatter = function (cueSheet) {
+/**
+ * Turns a cue sheet into a series of ffmpeg chapter extraction options.
+ *
+ * @returns An array which contains a list of options for each chapter.
+ */
+export function createFFmpegOptions(cueSheet: CueSheet): string[][] {
   assert(
     cueSheet.mediaFile,
     "Path to the media file is required to output ffmpeg commands",
@@ -34,13 +42,12 @@ export const formatFFmpegCommands: CueSheetFormatter = function (cueSheet) {
     ? "s:a:0" // first audio stream
     : "g"; // globally
 
-  const ffmpegCommands = cueSheet.cues.map((cue) => {
+  return cueSheet.cues.map((cue) => {
     const chapterOutputPath = `"${
       padNum(cue.position, 2)
     } - ${cue.title}${mediaExtension}"`;
 
     return [
-      "ffmpeg",
       "-hide_banner",
       `-i "${cueSheet.mediaFile}"`,
       `-ss ${cue.timeOffset}`,
@@ -52,10 +59,15 @@ export const formatFFmpegCommands: CueSheetFormatter = function (cueSheet) {
         ? `-metadata:${metadataSpecifier} artist="${cue.performer}"`
         : undefined,
       chapterOutputPath,
-    ].filter(isDefined).join(" ");
+    ].filter(isDefined);
   });
+}
 
-  return ffmpegCommands.join("\n");
+/** Formats a cue sheet as a series of ffmpeg chapter extraction commands. */
+export const formatFFmpegCommands: CueSheetFormatter = function (cueSheet) {
+  return createFFmpegOptions(cueSheet).map((chapterOptions) =>
+    ["ffmpeg", ...chapterOptions].join(" ")
+  ).join("\n");
 };
 
 export default {
