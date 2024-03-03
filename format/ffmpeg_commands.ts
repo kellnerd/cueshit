@@ -42,6 +42,13 @@ export function createFFmpegOptions(cueSheet: CueSheet): string[][] {
     ? "s:a:0" // first audio stream
     : "g"; // globally
 
+  /** Creates FFmpeg options to set a metadata tag if its value is defined. */
+  function setMetadata(tag: string, value?: string | number) {
+    if (isDefined(value)) {
+      return `-metadata:${metadataSpecifier} "${tag}=${value}"`;
+    }
+  }
+
   return cueSheet.cues.map((cue) => {
     const chapterOutputPath = `"${
       padNum(cue.position, 2)
@@ -54,10 +61,8 @@ export function createFFmpegOptions(cueSheet: CueSheet): string[][] {
       isDefined(cue.duration) ? `-t ${cue.duration}` : undefined,
       "-c copy", // copy streams, do not re-encode
       "-map_chapters -1", // drop chapters in output files
-      `-metadata:${metadataSpecifier} title="${cue.title}"`,
-      isDefined(cue.performer)
-        ? `-metadata:${metadataSpecifier} artist="${cue.performer}"`
-        : undefined,
+      setMetadata("title", cue.title),
+      setMetadata("artist", cue.performer),
       chapterOutputPath,
     ].filter(isDefined);
   });
