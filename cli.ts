@@ -44,8 +44,20 @@ export const cli = new Command()
     if (inputPath) {
       if (!options.from) {
         const possibleFormatIds = getPossibleFormatsByExtension(inputPath);
-        // We do not know the extension, expect multimedia file and call ffprobe.
+        // We do not know the extension, so we expect a multimedia file.
         if (!possibleFormatIds.length) {
+          // Fail if ffprobe permission has not been configured.
+          const ffprobeStatus = await Deno.permissions.query({
+            name: "run",
+            command: "ffprobe",
+          });
+          if (ffprobeStatus.state !== "granted") {
+            throw new ValidationError(
+              "Unknown input file extension, please specify an input format.",
+            );
+          }
+
+          // If the CLI has the permission to call ffprobe, we try to do that.
           const ffprobe = new Deno.Command("ffprobe", {
             args: [...recommendedFFProbeOptions, inputPath],
           });
