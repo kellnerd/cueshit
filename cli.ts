@@ -39,9 +39,12 @@ export const cli = new Command()
       );
     }
 
-    const input = await (inputPath
-      ? Deno.readTextFile(inputPath)
-      : toText(Deno.stdin.readable));
+    let input: string;
+    if (inputPath) {
+      input = await Deno.readTextFile(inputPath);
+    } else {
+      input = await toText(Deno.stdin.readable);
+    }
 
     // Parse input, detect format if not specified.
     let cueSheet: CueSheet | undefined;
