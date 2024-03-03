@@ -4,7 +4,7 @@ Convert between different cue sheet / chapter / tracklist formats.
 
 Each supported input format is parsed into an [internal representation] which can be serialized into a supported output format.
 
-## Usage
+## Setup
 
 Install the command line app (once [Deno] is set up on your computer):
 
@@ -15,10 +15,13 @@ deno install --allow-read --allow-write https://deno.land/x/cueshit/cli.ts
 If you have installed [FFmpeg], you can alternatively install the CLI with enabled FFmpeg integration:
 
 ```sh
-deno install --allow-run=ffprobe --allow-read --allow-write https://deno.land/x/cueshit/cli.ts
+deno install --allow-run=ffmpeg,ffprobe --allow-read --allow-write https://deno.land/x/cueshit/cli.ts
 ```
 
 This allows you to read embedded chapters directly from multimedia files using [ffprobe].
+Additionally you can also split multimedia files into one file per chapter.
+
+## Usage
 
 Display the integrated help to learn how to use the CLI:
 
@@ -37,6 +40,19 @@ See the sections below for [examples](#examples) and an overview of the [support
 > [!NOTE]
 > Input format (`--from` or `-f`) and output format (`--to` or `-t`) options are optional for conversion (since v0.3).
 > If these are not specified, the CLI automatically tries to detect them based on file extensions (and content).
+
+All formats which can be parsed (including embedded chapters) can also be used to split a multimedia file into its chapters.
+The following subcommand calls `ffmpeg` with the appropriate arguments under the hood:
+
+```sh
+cueshit split <input-path> [--from <format>]
+```
+
+Again you can display the integrated help to learn more about the command:
+
+```sh
+cueshit split --help
+```
 
 ### Examples
 
@@ -65,6 +81,12 @@ If you have enabled the FFmpeg integration during installation, the above comman
 
 ```sh
 cueshit test.flac --output test.cue
+```
+
+You can also split the audio into one file per chapter instead:
+
+```sh
+cueshit split test.flac
 ```
 
 Create a cue sheet from an Audacity label track (`labels.txt`) which belongs to the audio from `test.wav`.
