@@ -63,6 +63,8 @@ export function createFFmpegOptions(cueSheet: CueSheet): string[][] {
       "-map_chapters -1", // drop chapters in output files
       setMetadata("title", cue.title),
       setMetadata("artist", cue.performer),
+      setMetadata("album", cueSheet.title),
+      setMetadata("album_artist", cueSheet.performer),
       chapterOutputPath,
     ].filter(isDefined);
   });
