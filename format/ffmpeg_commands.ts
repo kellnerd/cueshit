@@ -27,14 +27,14 @@ const tagsAtStreamLevelExtensions = new Set([
 ]);
 
 /**
- * Turns a cue sheet into a series of ffmpeg chapter extraction options.
+ * Turns a cue sheet into a series of ffmpeg chapter extraction arguments.
  *
- * @returns An array which contains a list of options for each chapter.
+ * @returns An array which contains a list of ffmpeg arguments for each chapter.
  */
-export function createFFmpegOptions(cueSheet: CueSheet): string[][] {
+export function createFFmpegArguments(cueSheet: CueSheet): string[][] {
   assert(
     cueSheet.mediaFile,
-    "Path to the media file is required to output ffmpeg commands",
+    "Path to the media file is required to create ffmpeg arguments",
   );
 
   const mediaExtension = extname(cueSheet.mediaFile);
@@ -42,29 +42,40 @@ export function createFFmpegOptions(cueSheet: CueSheet): string[][] {
     ? "s:a:0" // first audio stream
     : "g"; // globally
 
-  /** Creates FFmpeg options to set a metadata tag if its value is defined. */
-  function setMetadata(tag: string, value?: string | number) {
+  /** Creates FFmpeg arguments to set a metadata tag if its value is defined. */
+  function setMetadata(tag: string, value?: string | number): string[] {
     if (isDefined(value)) {
-      return `-metadata:${metadataSpecifier} "${tag}=${value}"`;
+      return [
+        `-metadata:${metadataSpecifier}`,
+        `${tag}=${value}`,
+      ];
+    } else {
+      return [];
     }
   }
 
   return cueSheet.cues.map((cue) => {
-    const chapterOutputPath = `"${
+    const chapterOutputPath = `${
       padNum(cue.position, 2)
-    } - ${cue.title}${mediaExtension}"`;
+    } - ${cue.title}${mediaExtension}`;
 
     return [
       "-hide_banner",
-      `-i "${cueSheet.mediaFile}"`,
-      `-ss ${cue.timeOffset}`,
-      isDefined(cue.duration) ? `-t ${cue.duration}` : undefined,
-      "-c copy", // copy streams, do not re-encode
-      "-map_chapters -1", // drop chapters in output files
-      setMetadata("title", cue.title),
-      setMetadata("artist", cue.performer),
-      setMetadata("album", cueSheet.title),
-      setMetadata("album_artist", cueSheet.performer),
+      "-i",
+      cueSheet.mediaFile!,
+      "-ss",
+      cue.timeOffset.toFixed(6),
+      ...(isDefined(cue.duration) ? ["-t", cue.duration.toFixed(6)] : []),
+      // copy streams, do not re-encode
+      "-c",
+      "copy",
+      // drop chapters in output files
+      "-map_chapters",
+      "-1",
+      ...setMetadata("title", cue.title),
+      ...setMetadata("artist", cue.performer),
+      ...setMetadata("album", cueSheet.title),
+      ...setMetadata("album_artist", cueSheet.performer),
       chapterOutputPath,
     ].filter(isDefined);
   });
@@ -72,8 +83,8 @@ export function createFFmpegOptions(cueSheet: CueSheet): string[][] {
 
 /** Formats a cue sheet as a series of ffmpeg chapter extraction commands. */
 export const formatFFmpegCommands: CueSheetFormatter = function (cueSheet) {
-  return createFFmpegOptions(cueSheet).map((chapterOptions) =>
-    ["ffmpeg", ...chapterOptions].join(" ")
+  return createFFmpegArguments(cueSheet).map((chapterArguments) =>
+    ["ffmpeg", ...chapterArguments.map((argument) => `"${argument}"`)].join(" ")
   ).join("\n");
 };
 
