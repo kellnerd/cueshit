@@ -14,10 +14,11 @@ import {
 } from "./conversion.ts";
 import { type CueSheet } from "./cuesheet.ts";
 import { formats, inputFormatIds, outputFormatIds } from "./formats.ts";
+import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
 export const cli = new Command()
   .name("cueshit")
-  .version("0.3.0")
+  .version("0.4.0-dev")
   .description(`
     Convert between different cue sheet / chapter / tracklist formats.
 
@@ -41,7 +42,20 @@ export const cli = new Command()
 
     let input: string;
     if (inputPath) {
-      input = await Deno.readTextFile(inputPath);
+      if (!options.from) {
+        const possibleFormatIds = getPossibleFormatsByExtension(inputPath);
+        // We do not know the extension, expect multimedia file and call ffprobe.
+        if (!possibleFormatIds.length) {
+          const ffprobe = new Deno.Command("ffprobe", {
+            args: [...recommendedFFProbeOptions, inputPath],
+          });
+          const { stdout } = await ffprobe.output();
+          const textDecoder = new TextDecoder();
+          input = textDecoder.decode(stdout);
+          options.from = "ffprobe";
+        }
+      }
+      input ??= await Deno.readTextFile(inputPath);
     } else {
       input = await toText(Deno.stdin.readable);
     }
