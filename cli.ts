@@ -207,7 +207,14 @@ if (ffmpegStatus.state === "granted") {
       const cueSheet = await processCueSheetInput(inputPath, options);
       const textDecoder = new TextDecoder();
 
-      for (const args of createFFmpegArguments(cueSheet)) {
+      let chapterArguments: string[][];
+      try {
+        chapterArguments = createFFmpegArguments(cueSheet);
+      } catch (error) {
+        logErrorAndExit(error.message);
+      }
+
+      for (const args of chapterArguments) {
         const ffmpeg = new Deno.Command("ffmpeg", { args });
         const { stderr, success } = await ffmpeg.output();
 
