@@ -61,6 +61,8 @@ export function createFFmpegArguments(cueSheet: CueSheet): string[][] {
 
     return [
       "-hide_banner",
+      "-loglevel",
+      "warning",
       "-i",
       cueSheet.mediaFile!,
       "-ss",
