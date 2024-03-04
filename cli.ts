@@ -209,11 +209,17 @@ if (ffmpegStatus.state === "granted") {
 
       for (const args of createFFmpegArguments(cueSheet)) {
         const ffmpeg = new Deno.Command("ffmpeg", { args });
-        const { stderr, stdout, success } = await ffmpeg.output();
+        const { stderr, success } = await ffmpeg.output();
+
+        // FFmpeg writes all log messages to stderr
+        const logMessages = textDecoder.decode(stderr).trimEnd();
+        if (logMessages) {
+          console.log(logMessages);
+        }
+
         if (success) {
-          console.log(textDecoder.decode(stdout));
-        } else {
-          console.error(textDecoder.decode(stderr));
+          const outputPath = args.at(-1);
+          console.log(`Saved '${outputPath}'`);
         }
       }
     });
