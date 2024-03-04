@@ -91,7 +91,7 @@ export async function processCueSheetInput(
     if (result) {
       cueSheet = result.cueSheet;
     } else {
-      throw new ValidationError("Unsupported input format.");
+      logErrorAndExit("Input could not be parsed, unsupported format.");
     }
   }
 
@@ -102,7 +102,7 @@ export async function processCueSheetInput(
     } else if (key === "duration") {
       cueSheet[key] = parseFloat(value!);
     } else {
-      throw new ValidationError(`Cue sheets have no "${key}" property.`);
+      logErrorAndExit(`Cue sheets have no "${key}" property.`);
     }
   }
 
@@ -158,7 +158,7 @@ export const cli = new Command()
     // Try to format output.
     const output = formatCueSheet(cueSheet, options.to);
     if (!output) {
-      throw new ValidationError(`No formatter for "${options.to}" exists.`);
+      logErrorAndExit(`No formatter for "${options.to}" exists.`);
     }
 
     if (options.output) {
