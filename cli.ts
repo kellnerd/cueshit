@@ -1,4 +1,4 @@
-import { bold, yellow } from "https://deno.land/std@0.210.0/fmt/colors.ts";
+import { bold, red, yellow } from "https://deno.land/std@0.210.0/fmt/colors.ts";
 import { toText } from "https://deno.land/std@0.210.0/streams/to_text.ts";
 import {
   Command,
@@ -220,9 +220,16 @@ if (ffmpegStatus.state === "granted") {
         if (success) {
           const outputPath = args.at(-1);
           console.log(`Saved '${outputPath}'`);
+        } else {
+          logErrorAndExit("Failed to split input using ffprobe.");
         }
       }
     });
+}
+
+function logErrorAndExit(message: string, code = 1): never {
+  console.error(red(`${bold("error")}: ${message}`));
+  Deno.exit(code);
 }
 
 if (import.meta.main) {
