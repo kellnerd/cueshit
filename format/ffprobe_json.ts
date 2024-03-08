@@ -95,7 +95,7 @@ export const parseFFProbeJson: CueSheetParser = function (input) {
 
   return {
     title: tags.title,
-    performer: tags.artist,
+    performer: tags.artist ?? tags.ARTIST,
     mediaFile: format?.filename,
     duration: format ? parseFloat(format.duration) : undefined,
     cues: chapters?.map((chapter, index) => {
