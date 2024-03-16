@@ -7,6 +7,7 @@ import ffprobe_json from "./format/ffprobe_json.ts";
 import internal_json from "./format/internal_json.ts";
 import losslesscut_csv from "./format/losslesscut_csv.ts";
 import losslesscut_project from "./format/losslesscut_project.ts";
+import musicbrainz_api from "./format/musicbrainz_api.ts";
 import musicbrainz_tracklist from "./format/musicbrainz_tracklist.ts";
 import ogm_chapters from "./format/ogm_chapters.ts";
 import youtube_description from "./format/youtube_description.ts";
@@ -21,6 +22,7 @@ export const formats = {
   "llc": losslesscut_project,
   "losslesscut": losslesscut_csv,
   "musicbrainz": musicbrainz_tracklist,
+  "mb-api": musicbrainz_api,
   "ogm": ogm_chapters,
   "youtube": youtube_description,
 } satisfies Record<string, CueFormat>;

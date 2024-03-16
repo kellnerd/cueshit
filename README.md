@@ -114,6 +114,7 @@ internal              X     Internal Representation (JSON)
 llc                   X     LosslessCut Project (LLC)
 losslesscut    X      X     LosslessCut Segments (CSV)
 musicbrainz    X      X     MusicBrainz Track Parser Listing
+mb-api         X            MusicBrainz API Release (JSON)
 ogm                   X     OGM Tools Chapters / MKVToolNix Simple Chapters
 youtube        X      X     Youtube Description with Chapters
 ```
