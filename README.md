@@ -9,13 +9,13 @@ Each supported input format is parsed into an [internal representation] which ca
 Install the command line app (once [Deno] is set up on your computer):
 
 ```sh
-deno install --allow-read --allow-write https://deno.land/x/cueshit/cli.ts
+deno install --allow-read --allow-write --allow-net=musicbrainz.org https://deno.land/x/cueshit/cli.ts
 ```
 
 If you have installed [FFmpeg], you can alternatively install the CLI with enabled FFmpeg integration:
 
 ```sh
-deno install --allow-run=ffmpeg,ffprobe --allow-read --allow-write https://deno.land/x/cueshit/cli.ts
+deno install --allow-run=ffmpeg,ffprobe --allow-read --allow-write --allow-net=musicbrainz.org https://deno.land/x/cueshit/cli.ts
 ```
 
 This allows you to read embedded chapters directly from multimedia files using [ffprobe].

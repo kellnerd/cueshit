@@ -6,6 +6,7 @@ import {
   ValidationError,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
 import { Table } from "https://deno.land/x/cliffy@v1.0.0-rc.3/table/mod.ts";
+import { MusicBrainzClient } from "@kellnerd/musicbrainz/client.ts";
 import {
   detectFormatAndParseCueSheet,
   formatCueSheet,
@@ -22,8 +23,13 @@ import {
 import { createFFmpegArguments } from "./format/ffmpeg_commands.ts";
 import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
+/** MusicBrainz URLs which are accepted by the CLI. */
+const musicBrainzUrlPattern = new URLPattern({
+  pathname: "/release/:mbid([0-9a-f-]{36})",
+});
+
 /**
- * Creates a cue sheet from the content at the given input path.
+ * Creates a cue sheet from the content at the given input path or URL.
  *
  * - Automatically tries to detect format from file extension if not specified.
  * - Tries to call ffprobe for (multimedia) files with an unknown extension.
@@ -42,35 +48,57 @@ export async function processCueSheetInput(
   let input: string;
   if (inputPath) {
     if (!options.from) {
-      const possibleFormatIds = getPossibleFormatsByExtension(inputPath);
-      // We do not know the extension, so we expect a multimedia file.
-      if (!possibleFormatIds.length) {
-        // Fail if ffprobe permission has not been configured.
-        const ffprobeStatus = await Deno.permissions.query({
-          name: "run",
-          command: "ffprobe",
-        });
-        if (ffprobeStatus.state !== "granted") {
+      let url: URL | undefined;
+      try {
+        url = new URL(inputPath);
+      } catch {
+        url = undefined;
+      }
+      if (url) {
+        const mbid = musicBrainzUrlPattern.exec(url)?.pathname.groups.mbid;
+        if (!mbid) {
           throw new ValidationError(
-            "Unknown input file extension, please specify an input format.",
+            "Unsupported URL, only MusicBrainz release URLs are allowed.",
           );
         }
+        const mb = new MusicBrainzClient();
+        const release = await mb.lookup("release", mbid, [
+          "recordings",
+          "artist-credits",
+        ]);
+        input = JSON.stringify(release);
+        options.from = "mb-api";
+      } else {
+        const possibleFormatIds = getPossibleFormatsByExtension(inputPath);
+        // We do not know the extension, so we expect a multimedia file.
+        if (!possibleFormatIds.length) {
+          // Fail if ffprobe permission has not been configured.
+          const ffprobeStatus = await Deno.permissions.query({
+            name: "run",
+            command: "ffprobe",
+          });
+          if (ffprobeStatus.state !== "granted") {
+            throw new ValidationError(
+              "Unknown input file extension, please specify an input format.",
+            );
+          }
 
-        // If the CLI has the permission to call ffprobe, we try to do that.
-        const ffprobe = new Deno.Command("ffprobe", {
-          args: [...recommendedFFProbeOptions, inputPath],
-        });
-        const { stderr, stdout, success } = await ffprobe.output();
-        const textDecoder = new TextDecoder();
-        if (success) {
-          input = textDecoder.decode(stdout);
-          options.from = "ffprobe";
-        } else {
-          throw new ValidationError(
-            `Failed to open input with ffprobe: ${
-              textDecoder.decode(stderr)
-            }You may want to explicitly specify an input format.`,
-          );
+          // If the CLI has the permission to call ffprobe, we try to do that.
+          const ffprobe = new Deno.Command("ffprobe", {
+            args: [...recommendedFFProbeOptions, inputPath],
+          });
+          const { stderr, stdout, success } = await ffprobe.output();
+          const textDecoder = new TextDecoder();
+          if (success) {
+            input = textDecoder.decode(stdout);
+            options.from = "ffprobe";
+          } else {
+            throw new ValidationError(
+              `Failed to open input with ffprobe: ${
+                textDecoder.decode(stderr)
+              }You may want to explicitly specify an input format.`,
+            );
+          }
         }
       }
     }
@@ -112,11 +140,11 @@ export async function processCueSheetInput(
 /** Cliffy command specification of the CLI. */
 export const cli = new Command()
   .name("cueshit")
-  .version("0.4.0")
+  .version("0.5.0-dev")
   .description(`
     Convert between different cue sheet / chapter / tracklist formats.
 
-    Reads from standard input if no input path is specified.
+    Reads from standard input if no input path or URL is specified.
     Writes to standard output if no output path is specified.
     Automatically tries to detect input and output format if not specified.
   `)
