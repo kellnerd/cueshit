@@ -2,6 +2,8 @@
  * [FFmpeg] commands to split a multimedia file into its chapters.
  *
  * [FFmpeg]: https://ffmpeg.org/ffmpeg.html
+ *
+ * @module
  */
 
 import { assert } from "https://deno.land/std@0.210.0/assert/assert.ts";

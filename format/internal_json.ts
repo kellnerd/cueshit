@@ -1,5 +1,7 @@
 /**
  * Internal representation of a {@linkcode CueSheet}, serialized as JSON.
+ *
+ * @module
  */
 
 import type { CueFormat, CueSheet } from "../cuesheet.ts";

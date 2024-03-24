@@ -11,6 +11,8 @@
  * ```
  *
  * [LosslessCut]: https://github.com/mifi/lossless-cut
+ *
+ * @module
  */
 
 import { stringify as stringifyCsv } from "https://deno.land/std@0.210.0/csv/stringify.ts";

@@ -10,6 +10,8 @@
  * ```
  *
  * [label track]: https://manual.audacityteam.org/man/label_tracks.html
+ *
+ * @module
  */
 
 import {

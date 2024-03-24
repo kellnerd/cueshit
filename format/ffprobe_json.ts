@@ -10,6 +10,8 @@
  * the `-show_format` and `-show_streams` options should also be specified.
  *
  * [ffprobe]: https://ffmpeg.org/ffprobe.html
+ *
+ * @module
  */
 
 import { type CueFormat, type CueSheetParser } from "../cuesheet.ts";

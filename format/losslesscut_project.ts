@@ -2,6 +2,8 @@
  * [LosslessCut] project (LLC) format, JSON5 based.
  *
  * [LosslessCut]: https://github.com/mifi/lossless-cut
+ *
+ * @module
  */
 
 import {

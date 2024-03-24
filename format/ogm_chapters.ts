@@ -12,6 +12,8 @@
  * [MKVToolNix]: https://mkvtoolnix.download/doc/mkvmerge.html#mkvmerge.chapters
  * [OGM tools]: https://www.bunkus.org/videotools/ogmtools/
  * [simple chapter format]: https://mkvtoolnix.download/doc/mkvmerge.html#mkvmerge.chapters.simple
+ *
+ * @module
  */
 
 import type { CueFormat, CueFormatter } from "../cuesheet.ts";

@@ -12,6 +12,8 @@
  *     TITLE "Another Title"
  *     INDEX 01 02:56:42
  * ```
+ *
+ * @module
  */
 
 import type {

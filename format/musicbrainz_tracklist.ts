@@ -12,6 +12,8 @@
  *
  * [MusicBrainz]: https://musicbrainz.org/
  * [track parser]: https://wiki.musicbrainz.org/How_to_Add_a_Release#The_Track_Parser_.28Manual_entry.29
+ *
+ * @module
  */
 
 import type {

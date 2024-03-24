@@ -10,6 +10,8 @@
  * 12:56 Test Title
  * 1:04:17 Credits
  * ```
+ *
+ * @module
  */
 
 import type {
