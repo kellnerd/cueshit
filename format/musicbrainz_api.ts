@@ -1,28 +1,29 @@
 /**
- * URL to a [MusicBrainz] release.
+ * [MusicBrainz] API release lookup result in JSON format.
+ *
+ * The lookup has to specify the include parameters `recordings` and `artist-credits`.
  *
  * [MusicBrainz]: https://musicbrainz.org/
+ *
+ * @module
  */
 
-import type {
-  ArtistCredit,
-  Release,
-  WithIncludes,
-} from "@kellnerd/musicbrainz/api_types.ts";
+import type { ArtistCredit, Release } from "@kellnerd/musicbrainz/api_types.ts";
 import type { Cue, CueFormat, CueSheetParser } from "../cuesheet.ts";
 
-function joinArtistCredit(credits: ArtistCredit[]): string {
+function joinArtistCredit(credits?: ArtistCredit[]): string | undefined {
+  if (!credits) return;
   return credits.flatMap((credit) => [credit.name, credit.joinphrase]).join("");
 }
 
 /** Parses a MusicBrainz track parser listing into cues. */
 export const parseMusicBrainzRelease: CueSheetParser = function (body) {
-  const release: WithIncludes<Release, string> = JSON.parse(body);
+  const release: Release<"recordings" | "artist-credits"> = JSON.parse(body);
   const cues: Cue[] = [];
   let previousCue: Cue | undefined = undefined;
 
-  for (const medium of release.media) {
-    for (const track of medium.tracks) {
+  for (const medium of release.media ?? []) {
+    for (const track of medium.tracks ?? []) {
       const cue: Cue = {
         title: track.title,
         performer: joinArtistCredit(track["artist-credit"]),
