@@ -23,6 +23,10 @@ import {
 import { createFFmpegArguments } from "./format/ffmpeg_commands.ts";
 import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
+const version = "0.5.0";
+
+const userAgent = `cueshit/${version} ( https://deno.land/x/cueshit )`;
+
 /** MusicBrainz URLs which are accepted by the CLI. */
 const musicBrainzUrlPattern = new URLPattern({
   pathname: "/release/:mbid([0-9a-f-]{36})",
@@ -61,7 +65,7 @@ export async function processCueSheetInput(
             "Unsupported URL, only MusicBrainz release URLs are allowed.",
           );
         }
-        const mb = new MusicBrainzClient();
+        const mb = new MusicBrainzClient({ userAgent });
         const release = await mb.lookup("release", mbid, [
           "recordings",
           "artist-credits",
@@ -140,7 +144,7 @@ export async function processCueSheetInput(
 /** Cliffy command specification of the CLI. */
 export const cli = new Command()
   .name("cueshit")
-  .version("0.5.0-dev")
+  .version(version)
   .description(`
     Convert between different cue sheet / chapter / tracklist formats.
 
