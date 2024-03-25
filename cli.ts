@@ -6,7 +6,7 @@ import {
   ValidationError,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
 import { Table } from "https://deno.land/x/cliffy@v1.0.0-rc.3/table/mod.ts";
-import { MusicBrainzClient } from "@kellnerd/musicbrainz/client.ts";
+import { MusicBrainzClient } from "jsr:@kellnerd/musicbrainz@^0.0.3";
 import {
   detectFormatAndParseCueSheet,
   formatCueSheet,

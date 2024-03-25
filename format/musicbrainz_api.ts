@@ -8,7 +8,10 @@
  * @module
  */
 
-import type { ArtistCredit, Release } from "@kellnerd/musicbrainz/api_types.ts";
+import type {
+  ArtistCredit,
+  Release,
+} from "jsr:@kellnerd/musicbrainz@^0.0.3/api_types";
 import type { Cue, CueFormat, CueSheetParser } from "../cuesheet.ts";
 
 function joinArtistCredit(credits?: ArtistCredit[]): string | undefined {
