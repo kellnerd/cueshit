@@ -260,7 +260,7 @@ if (ffmpegStatus.state === "granted") {
           const outputPath = args.at(-1);
           console.log(`Saved '${outputPath}'`);
         } else {
-          logErrorAndExit("Failed to split input using ffprobe.");
+          logErrorAndExit("Failed to split input using ffmpeg.");
         }
       }
     });
