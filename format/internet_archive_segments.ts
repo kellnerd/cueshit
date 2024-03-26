@@ -15,53 +15,59 @@ import type { Cue, CueFormat, CueSheetParser } from "../cuesheet.ts";
 /** Segment data for a digitized audio file, usually one side of a record. */
 export interface IAFileSegmentData {
   /** Tracks which are contained in the audio file. */
-  "tracks": IATrack[];
+  tracks: IATrack[];
   /** Name of the audio file, including directory. */
-  "file": string;
+  file: string;
   /** Directory of the audio file, usually one per disc. */
-  "target_dir": string;
-  "segmenter_version": string;
-  "archivelp_version": string;
+  target_dir: string;
+  segmenter_version: string;
+  archivelp_version: string;
 }
 
 /** Audio track which is contained in a digitized audio file. */
 export interface IATrack {
-  /** Basic metadata of the track */
-  "file_md": {
-    /** Number of the track, numbering is reset per file. */
-    "track": string;
-    /** Name of the track. */
-    "title": string;
-    /** Artist(s) of the track. */
-    "artist": string;
-    /** Name of the release. */
-    "album": string;
-    /** Number of the disc. */
-    "disc": string;
-  };
-  "segments": {
-    /** Initial segment description with a confidence value. */
-    "initial": IASegment;
-    /**
-     * Final segment description without a confidence value.
-     * Times are usually identical to the `initial` segment description.
-     */
-    "final": IASegment;
-  };
-  /** Metadata tags of the file, names seem to be upper case Vorbis comments. */
-  "file_tags": Record<string, string | string[]>;
+  /** Basic metadata of the track. */
+  file_md: IATrackMetadata;
+  segments: IASegments;
+  /** Metadata tags of the track, names seem to be upper case Vorbis comments. */
+  file_tags: Record<string, string | string[]>;
+}
+
+/** Basic metadata of an audio track. */
+export interface IATrackMetadata {
+  /** Number of the track, numbering is reset per file. */
+  track: string;
+  /** Name of the track. */
+  title: string;
+  /** Artist(s) of the track. */
+  artist: string;
+  /** Name of the release. */
+  album: string;
+  /** Number of the disc. */
+  disc: string;
+}
+
+/** Possible audio segments of a track in a digitized audio file. */
+export interface IASegments {
+  /** Initial segment description with a confidence value. */
+  initial: IASegment;
+  /**
+   * Final segment description without a confidence value.
+   * Times are usually identical to the `initial` segment description.
+   */
+  final: IASegment;
 }
 
 /** Corresponding audio segment of a track in a digitized audio file. */
 export interface IASegment {
   /** Duration in milliseconds. */
-  "duration": number;
+  duration: number;
   /** Start time in milliseconds. */
-  "start": number;
+  start: number;
   /** Confidence value (floating point), usually 0.0? */
-  "confidence"?: number;
+  confidence?: number;
   /** End time in milliseconds. */
-  "end": number;
+  end: number;
 }
 
 /** Parses an Internet Archive segment data JSON document into cues. */
