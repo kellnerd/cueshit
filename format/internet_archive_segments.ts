@@ -79,6 +79,7 @@ export const parseInternetArchiveSegments: CueSheetParser = function (body) {
         position: parseInt(meta.track),
         duration: segment.duration / 1000,
         timeOffset: segment.start / 1000,
+        mediaFile: side.file,
       };
       cues.push(cue);
     }

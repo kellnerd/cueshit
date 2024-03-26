@@ -10,6 +10,11 @@ export interface Cue {
   performer?: string;
   /** Duration of the cue (in seconds). */
   duration?: number;
+  /**
+   * Path to a media file to which the time offset relates.
+   * Overwrites {@linkcode CueSheet.mediaFile}.
+   */
+  mediaFile?: string;
 }
 
 /** Function which serializes a cue into a string. */
