@@ -17,6 +17,7 @@
  */
 
 import type {
+  Cue,
   CueFormat,
   CueFormatter,
   CueSheetFormatter,
@@ -49,10 +50,26 @@ function command(name: string, ...values: Array<string | number | undefined>) {
 }
 
 /** Formats the commands for a single cue. */
-export const formatCue: CueFormatter = function (cue) {
-  const trackNumber = padNum(cue.position, 2);
+export const formatCue: CueFormatter = function (
+  cue,
+  index?: number,
+  cues?: Cue[],
+) {
+  let mediaFile = cue.mediaFile;
+  // Do not repeat identical FILE commands if we are writing a full cue sheet.
+  if (index && cues) {
+    // The media file has not changed since the last cue.
+    if (mediaFile === cues[index - 1].mediaFile) {
+      mediaFile = undefined;
+    }
+  } else if (index === 0) {
+    // We have already written a global FILE command before the first cue.
+    mediaFile = undefined;
+  }
+
   return [
-    command("  TRACK", trackNumber, "AUDIO"),
+    command("FILE", mediaFile, "WAVE"),
+    command("  TRACK", padNum(cue.position, 2), "AUDIO"),
     command("    TITLE", cue.title),
     command("    PERFORMER", cue.performer),
     command("    INDEX", "01", formatTimestamp(cue.timeOffset)),
@@ -61,10 +78,13 @@ export const formatCue: CueFormatter = function (cue) {
 
 /** Formats the commands for a cue sheet. */
 export const formatCueSheet: CueSheetFormatter = function (cueSheet) {
+  // Prefer media file of the first cue over global media file.
+  const mediaFile = cueSheet.cues[0].mediaFile ?? cueSheet.mediaFile;
+
   return [
     command("TITLE", cueSheet.title),
     command("PERFORMER", cueSheet.performer),
-    command("FILE", cueSheet.mediaFile ?? "unknown.wav", "WAVE"),
+    command("FILE", mediaFile ?? "unknown.wav", "WAVE"),
     ...cueSheet.cues.map(formatCue),
   ].filter(isDefined).join("\n");
 };
