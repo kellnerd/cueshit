@@ -5,6 +5,7 @@ import cue_sheet from "./format/cue_sheet.ts";
 import ffmpeg_commands from "./format/ffmpeg_commands.ts";
 import ffprobe_json from "./format/ffprobe_json.ts";
 import internal_json from "./format/internal_json.ts";
+import internet_archive_segments from "./format/internet_archive_segments.ts";
 import losslesscut_csv from "./format/losslesscut_csv.ts";
 import losslesscut_project from "./format/losslesscut_project.ts";
 import musicbrainz_api from "./format/musicbrainz_api.ts";
@@ -18,6 +19,7 @@ export const formats = {
   "cue": cue_sheet,
   "ffmpeg": ffmpeg_commands,
   "ffprobe": ffprobe_json,
+  "ia-segments": internet_archive_segments,
   "internal": internal_json,
   "llc": losslesscut_project,
   "losslesscut": losslesscut_csv,

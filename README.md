@@ -110,6 +110,7 @@ audacity       X      X     Audacity Label Track (TSV)
 cue                   X     Cue Sheet
 ffmpeg                X     FFmpeg Split Commands
 ffprobe        X            ffprobe Metadata with Chapters (JSON)
+ia-segments    X            Internet Archive Segment Data (JSON)
 internal              X     Internal Representation (JSON)
 llc                   X     LosslessCut Project (LLC)
 losslesscut    X      X     LosslessCut Segments (CSV)
