@@ -4,18 +4,21 @@ Convert between different cue sheet / chapter / tracklist formats.
 
 Each supported input format is parsed into an [internal representation] which can be serialized into a supported output format.
 
+The command line app can read from standard input (default), local files (specify a path) and online resources (specify an URL).
+It will write to standard output (default) or to a local file (specify a path).
+
 ## Setup
 
 Install the command line app (once [Deno] is set up on your computer):
 
 ```sh
-deno install --allow-read --allow-write --allow-net=musicbrainz.org https://deno.land/x/cueshit/cli.ts
+deno install --allow-read --allow-write --allow-net https://deno.land/x/cueshit/cli.ts
 ```
 
 If you have installed [FFmpeg], you can alternatively install the CLI with enabled FFmpeg integration:
 
 ```sh
-deno install --allow-run=ffmpeg,ffprobe --allow-read --allow-write --allow-net=musicbrainz.org https://deno.land/x/cueshit/cli.ts
+deno install --allow-run=ffmpeg,ffprobe --allow-read --allow-write --allow-net https://deno.land/x/cueshit/cli.ts
 ```
 
 This allows you to read embedded chapters directly from multimedia files using [ffprobe].
@@ -32,7 +35,7 @@ cueshit --help
 The basic command to convert from one format to another looks as follows:
 
 ```sh
-cueshit [input-path] [--from <format>] [--to <format>] [--output <path>]
+cueshit [input-path-or-url] [--from <format>] [--to <format>] [--output <path>]
 ```
 
 See the sections below for [examples](#examples) and an overview of the [supported formats](#supported-formats).
@@ -45,7 +48,7 @@ All formats which can be parsed (including embedded chapters) can also be used t
 The following subcommand calls `ffmpeg` with the appropriate arguments under the hood:
 
 ```sh
-cueshit split <input-path> [--from <format>]
+cueshit split <input-path-or-url> [--from <format>]
 ```
 
 Again you can display the integrated help to learn more about the command:

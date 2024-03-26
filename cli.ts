@@ -23,7 +23,7 @@ import {
 import { createFFmpegArguments } from "./format/ffmpeg_commands.ts";
 import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
-const version = "0.5.0";
+const version = "0.6.0";
 
 const userAgent = `cueshit/${version} ( https://deno.land/x/cueshit )`;
 
@@ -39,41 +39,48 @@ const musicBrainzUrlPattern = new URLPattern({
  * - Tries to call ffprobe for (multimedia) files with an unknown extension.
  * - If the extension is ambiguous, all parsers will be tried until success.
  *
- * @param inputPath Path to the input, falls back to standard input.
+ * @param inputPathOrUrl Path or URL to the input, falls back to standard input.
  * @param options Source format and additional cue sheet properties.
  */
 export async function processCueSheetInput(
-  inputPath: string | undefined,
+  inputPathOrUrl: string | undefined,
   options: {
     from?: CueFormatId;
     sheet?: Record<string, string | undefined>;
   },
 ): Promise<CueSheet> {
   let input: string;
-  if (inputPath) {
+  if (inputPathOrUrl) {
     if (!options.from) {
       let url: URL | undefined;
       try {
-        url = new URL(inputPath);
+        url = new URL(inputPathOrUrl);
       } catch {
         url = undefined;
       }
       if (url) {
         const mbid = musicBrainzUrlPattern.exec(url)?.pathname.groups.mbid;
-        if (!mbid) {
-          throw new ValidationError(
-            "Unsupported URL, only MusicBrainz release URLs are allowed.",
-          );
+        if (mbid) {
+          const mb = new MusicBrainzClient({ userAgent });
+          const release = await mb.lookup("release", mbid, [
+            "recordings",
+            "artist-credits",
+          ]);
+          input = JSON.stringify(release);
+          options.from = "mb-api";
+        } else {
+          const response = await fetch(inputPathOrUrl, {
+            headers: { "User-Agent": userAgent },
+          });
+          if (!response.ok) {
+            throw new ValidationError(
+              "Failed to fetch from URL, are you sure it is supported?",
+            );
+          }
+          input = await response.text();
         }
-        const mb = new MusicBrainzClient({ userAgent });
-        const release = await mb.lookup("release", mbid, [
-          "recordings",
-          "artist-credits",
-        ]);
-        input = JSON.stringify(release);
-        options.from = "mb-api";
       } else {
-        const possibleFormatIds = getPossibleFormatsByExtension(inputPath);
+        const possibleFormatIds = getPossibleFormatsByExtension(inputPathOrUrl);
         // We do not know the extension, so we expect a multimedia file.
         if (!possibleFormatIds.length) {
           // Fail if ffprobe permission has not been configured.
@@ -89,7 +96,7 @@ export async function processCueSheetInput(
 
           // If the CLI has the permission to call ffprobe, we try to do that.
           const ffprobe = new Deno.Command("ffprobe", {
-            args: [...recommendedFFProbeOptions, inputPath],
+            args: [...recommendedFFProbeOptions, inputPathOrUrl],
           });
           const { stderr, stdout, success } = await ffprobe.output();
           const textDecoder = new TextDecoder();
@@ -108,7 +115,7 @@ export async function processCueSheetInput(
     }
     // The (text-based) input format has explicitly been specified or we know
     // the file extension. We want to directly read the text content.
-    input ??= await Deno.readTextFile(inputPath);
+    input ??= await Deno.readTextFile(inputPathOrUrl);
   } else {
     input = await toText(Deno.stdin.readable);
   }
@@ -119,7 +126,7 @@ export async function processCueSheetInput(
     // Specified input format is guaranteed to be supported (cliffy EnumType).
     cueSheet = parseCueSheet(input, options.from)!;
   } else {
-    const result = detectFormatAndParseCueSheet(input, inputPath);
+    const result = detectFormatAndParseCueSheet(input, inputPathOrUrl);
     if (result) {
       cueSheet = result.cueSheet;
     } else {
@@ -158,15 +165,15 @@ export const cli = new Command()
   .option("-t, --to <format:output-format>", "ID of the output format.")
   .option("-o, --output <path:file>", "Path to the output file.")
   .option("--sheet.* <value>", "Set the value of a cue sheet property.")
-  .arguments("[input-path:file]")
-  .action(async (options, inputPath) => {
+  .arguments("[input-path-or-url:file]")
+  .action(async (options, inputPathOrUrl) => {
     if (!options.to && !options.output) {
       throw new ValidationError(
         'Missing option "--to" or "--output" to determine output format.',
       );
     }
 
-    const cueSheet = await processCueSheetInput(inputPath, options);
+    const cueSheet = await processCueSheetInput(inputPathOrUrl, options);
 
     // Determine output format using file extension, if not specified.
     if (!options.to) {
