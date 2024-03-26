@@ -23,6 +23,7 @@ import type {
   CueSheetParser,
 } from "../cuesheet.ts";
 import { getDurationFormatter, parseDuration, TimeUnit } from "../duration.ts";
+import { isDefined } from "../utils.ts";
 
 const formatDuration = getDurationFormatter({
   largestUnit: TimeUnit.minutes,
@@ -30,8 +31,8 @@ const formatDuration = getDurationFormatter({
 
 /** Formats a line with a track for the MusicBrainz track parser. */
 export const formatMusicBrainzTrack: CueFormatter = function (cue) {
-  // TODO: Include performer (if known)
-  return `${cue.position}. ${cue.title} (${
+  const label = [cue.title, cue.performer].filter(isDefined).join(" - ");
+  return `${cue.position}. ${label} (${
     formatDuration(cue.duration) ?? "?:??"
   })`;
 };
