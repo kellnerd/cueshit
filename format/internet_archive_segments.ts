@@ -100,8 +100,11 @@ export const parseInternetArchiveSegments: CueSheetParser = function (body) {
   };
 };
 
-function joinMultiValueTag(value: string | string[], separator = "; "): string {
-  return typeof value === "string" ? value : value.join(separator);
+function joinMultiValueTag(
+  value?: string | string[],
+  separator = "; ",
+): string | undefined {
+  return Array.isArray(value) ? value.join(separator) : value;
 }
 
 export default {
