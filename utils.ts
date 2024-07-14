@@ -12,3 +12,11 @@ export function padNum(value: number, maxLength: number) {
 export function quoteArgument(value: string) {
   return `'${value.replaceAll("'", "'\\''")}'`;
 }
+
+/** Replaces characters which are not allowed in a Windows filename. */
+export function sanitizeFilename(baseName: string): string {
+  // https://learn.microsoft.com/en-gb/windows/win32/fileio/naming-a-file#naming-conventions
+  // deno-lint-ignore no-control-regex
+  const illegalCharacters = /[\u0000-\u001F<>:"/\\|?*]/g;
+  return baseName.replaceAll(illegalCharacters, "_");
+}

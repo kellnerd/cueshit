@@ -13,7 +13,12 @@ import {
   type CueSheet,
   type CueSheetFormatter,
 } from "../cuesheet.ts";
-import { isDefined, padNum, quoteArgument } from "../utils.ts";
+import {
+  isDefined,
+  padNum,
+  quoteArgument,
+  sanitizeFilename,
+} from "../utils.ts";
 
 /**
  * Audio file extensions for which FFmpeg treats tags as if they are stored at
@@ -68,9 +73,9 @@ export function createFFmpegArguments(
   }
 
   return cueSheet.cues.map((cue) => {
-    const chapterOutputPath = `${padNum(cue.position, 2)} - ${cue.title}${
-      options?.outputExtension ?? mediaExtension
-    }`;
+    const chapterOutputPath = `${padNum(cue.position, 2)} - ${
+      sanitizeFilename(cue.title)
+    }${options?.outputExtension ?? mediaExtension}`;
 
     return [
       "-hide_banner",
