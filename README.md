@@ -48,7 +48,7 @@ All formats which can be parsed (including embedded chapters) can also be used t
 The following subcommand calls `ffmpeg` with the appropriate arguments under the hood:
 
 ```sh
-cueshit split <input-path-or-url> [--from <format>]
+cueshit split [--from <format>] <input-path-or-url> [ffmpeg-options...]
 ```
 
 Again you can display the integrated help to learn more about the command:

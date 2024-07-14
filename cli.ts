@@ -23,7 +23,7 @@ import {
 import { createFFmpegArguments } from "./format/ffmpeg_commands.ts";
 import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
-const version = "0.6.0";
+const version = "0.7.0";
 
 const userAgent = `cueshit/${version} ( https://deno.land/x/cueshit )`;
 
@@ -233,22 +233,31 @@ const ffmpegStatus = await Deno.permissions.query({
 // Register command which relies on the permission to run ffmpeg.
 if (ffmpegStatus.state === "granted") {
   cli
-    .command("split <input-path:file>")
+    .command("split <input-path-or-url:file> [ffmpeg-options...]")
     .description(`
       Split a media file into its chapters (using ffmpeg).
 
       Accepts a multimedia file with embedded chapters or a cue file as input.
       The split media files will be numbered and output into the working directory.
+      Additional ffmpeg options for the output file can be specified at the end.
     `)
     .option("-f, --from <format:input-format>", "ID of the input format.")
+    .option(
+      "-x, --ext <output-ext>",
+      "File extension of the output files (with leading period).",
+    )
     .option("--sheet.* <value>", "Set the value of a cue sheet property.")
-    .action(async (options, inputPath) => {
+    .stopEarly()
+    .action(async (options, inputPath, ...ffmpegOptions) => {
       const cueSheet = await processCueSheetInput(inputPath, options);
       const textDecoder = new TextDecoder();
 
       let chapterArguments: string[][];
       try {
-        chapterArguments = createFFmpegArguments(cueSheet);
+        chapterArguments = createFFmpegArguments(cueSheet, {
+          output: ffmpegOptions,
+          outputExtension: options.ext,
+        });
       } catch (error) {
         logErrorAndExit(error.message);
       }
