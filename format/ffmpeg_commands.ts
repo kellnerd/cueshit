@@ -28,12 +28,23 @@ const tagsAtStreamLevelExtensions = new Set([
   ".opus",
 ]);
 
+/** Custom FFmpeg options. */
+interface FFmpegOptions {
+  /** Additional output file options. */
+  output?: string[];
+  /** File extension of the output files (with leading period). */
+  outputExtension?: string;
+}
+
 /**
  * Turns a cue sheet into a series of ffmpeg chapter extraction arguments.
  *
  * @returns An array which contains a list of ffmpeg arguments for each chapter.
  */
-export function createFFmpegArguments(cueSheet: CueSheet): string[][] {
+export function createFFmpegArguments(
+  cueSheet: CueSheet,
+  options?: FFmpegOptions,
+): string[][] {
   assert(
     cueSheet.mediaFile,
     "Path to the media file is required to create ffmpeg arguments",
@@ -57,9 +68,9 @@ export function createFFmpegArguments(cueSheet: CueSheet): string[][] {
   }
 
   return cueSheet.cues.map((cue) => {
-    const chapterOutputPath = `${
-      padNum(cue.position, 2)
-    } - ${cue.title}${mediaExtension}`;
+    const chapterOutputPath = `${padNum(cue.position, 2)} - ${cue.title}${
+      options?.outputExtension ?? mediaExtension
+    }`;
 
     return [
       "-hide_banner",
@@ -80,6 +91,7 @@ export function createFFmpegArguments(cueSheet: CueSheet): string[][] {
       ...setMetadata("artist", cue.performer),
       ...setMetadata("album", cueSheet.title),
       ...setMetadata("album_artist", cueSheet.performer),
+      ...(options?.output ?? []),
       chapterOutputPath,
     ].filter(isDefined);
   });
