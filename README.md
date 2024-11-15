@@ -57,6 +57,10 @@ Again you can display the integrated help to learn more about the command:
 cueshit split --help
 ```
 
+> [!NOTE]
+> Many supported cue sheet formats can not store the path to the associated media file.
+> For these formats the path to the source media file has to be passed with `--sheet.media-file <path>`.
+
 ### Examples
 
 Convert chapters from a YouTube description into a MusicBrainz track parser listing.
