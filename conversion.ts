@@ -1,5 +1,5 @@
 import { extname } from "https://deno.land/std@0.210.0/path/extname.ts";
-import type { CueSheet } from "./cuesheet.ts";
+import type { CueSheet, ParserOptions } from "./cuesheet.ts";
 import {
   type CueFormatId,
   formatIds,
@@ -17,8 +17,15 @@ import {
 export function parseCueSheet(
   content: string,
   formatId: CueFormatId,
+  options?: ParserOptions,
 ): CueSheet | undefined {
-  return formats[formatId].parse?.(content);
+  return formats[formatId].parse?.(content, options);
+}
+
+/** Options for detecting the format and parsing a cue sheet. */
+export interface ParserDetectionOptions extends ParserOptions {
+  /** Path to the cue sheet file (including extension). */
+  path?: string;
 }
 
 /** Result of a cue sheet format detection. */
@@ -39,22 +46,21 @@ export interface DetectionResult {
  * which are using this file extension.
  *
  * @param content Serialized content of the cue sheet.
- * @param path Path to the cue sheet file (including extension).
  * @returns Parsed cue sheet and its format ID or `undefined` if detection failed.
  */
 export function detectFormatAndParseCueSheet(
   content: string,
-  path?: string,
+  options: ParserDetectionOptions = {},
 ): DetectionResult | undefined {
   const prioritizedFormatIds = new Set([
-    ...(path ? getPossibleFormatsByExtension(path) : []),
+    ...(options.path ? getPossibleFormatsByExtension(options.path) : []),
     ...inputFormatIds,
   ]);
 
   let cueSheet: CueSheet | undefined;
   for (const formatId of prioritizedFormatIds) {
     try {
-      cueSheet = parseCueSheet(content, formatId);
+      cueSheet = parseCueSheet(content, formatId, options);
       if (cueSheet?.cues.length) {
         return { cueSheet, formatId };
       }

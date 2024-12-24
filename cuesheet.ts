@@ -43,8 +43,17 @@ export interface CueSheet {
 /** Function which serializes a cue sheet into a string. */
 export type CueSheetFormatter = (cueSheet: CueSheet) => string;
 
+/** Options for parsing a cue sheet. Parsers can ignore unsupported options. */
+export interface ParserOptions {
+  /** Position of the medium which should be parsed. */
+  mediumPosition?: number;
+}
+
 /** Function which extracts a cue sheet from a string. */
-export type CueSheetParser = (input: string) => CueSheet;
+export type CueSheetParser = (
+  input: string,
+  options?: ParserOptions,
+) => CueSheet;
 
 /** Specification of a cue format. */
 export interface CueFormat {

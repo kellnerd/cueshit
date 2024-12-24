@@ -13,7 +13,7 @@ import {
   getPossibleFormatsByExtension,
   parseCueSheet,
 } from "./conversion.ts";
-import { type CueSheet } from "./cuesheet.ts";
+import { type CueSheet, ParserOptions } from "./cuesheet.ts";
 import {
   type CueFormatId,
   formats,
@@ -29,7 +29,7 @@ const userAgent = `cueshit/${version} ( https://deno.land/x/cueshit )`;
 
 /** MusicBrainz URLs which are accepted by the CLI. */
 const musicBrainzUrlPattern = new URLPattern({
-  pathname: "/release/:mbid([0-9a-f-]{36})",
+  pathname: "/release/:mbid([0-9a-f-]{36})", // TODO: support medium
 });
 
 /**
@@ -50,6 +50,7 @@ export async function processCueSheetInput(
   },
 ): Promise<CueSheet> {
   let input: string;
+  const parserOptions: ParserOptions = {};
   if (inputPathOrUrl) {
     if (!options.from) {
       let url: URL | undefined;
@@ -124,9 +125,12 @@ export async function processCueSheetInput(
   let cueSheet: CueSheet | undefined;
   if (options.from) {
     // Specified input format is guaranteed to be supported (cliffy EnumType).
-    cueSheet = parseCueSheet(input, options.from)!;
+    cueSheet = parseCueSheet(input, options.from, parserOptions)!;
   } else {
-    const result = detectFormatAndParseCueSheet(input, inputPathOrUrl);
+    const result = detectFormatAndParseCueSheet(input, {
+      ...parserOptions,
+      path: inputPathOrUrl,
+    });
     if (result) {
       cueSheet = result.cueSheet;
     } else {

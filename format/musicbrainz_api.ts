@@ -20,12 +20,20 @@ function joinArtistCredit(credits?: ArtistCredit[]): string | undefined {
 }
 
 /** Parses a MusicBrainz track parser listing into cues. */
-export const parseMusicBrainzRelease: CueSheetParser = function (body) {
+export const parseMusicBrainzRelease: CueSheetParser = function (
+  body,
+  options = {},
+) {
   const release: Release<"recordings" | "artist-credits"> = JSON.parse(body);
+  const { mediumPosition } = options;
   const cues: Cue[] = [];
   let previousCue: Cue | undefined = undefined;
 
   for (const medium of release.media ?? []) {
+    if (mediumPosition && mediumPosition !== medium.position) {
+      continue;
+    }
+
     for (const track of medium.tracks ?? []) {
       const cue: Cue = {
         title: track.title,
