@@ -1,6 +1,7 @@
 import type { CueFormat } from "./cuesheet.ts";
 
 import audacity_labels from "./format/audacity_labels.ts";
+import cd_info from "./format/cd_info.ts";
 import cue_sheet from "./format/cue_sheet.ts";
 import ffmpeg_commands from "./format/ffmpeg_commands.ts";
 import ffprobe_json from "./format/ffprobe_json.ts";
@@ -16,6 +17,7 @@ import youtube_description from "./format/youtube_description.ts";
 /** Maps format IDs to format specifications. */
 export const formats = {
   "audacity": audacity_labels,
+  "cd-info": cd_info,
   "cue": cue_sheet,
   "ffmpeg": ffmpeg_commands,
   "ffprobe": ffprobe_json,

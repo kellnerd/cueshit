@@ -23,7 +23,7 @@ import {
 import { createFFmpegArguments } from "./format/ffmpeg_commands.ts";
 import { recommendedFFProbeOptions } from "./format/ffprobe_json.ts";
 
-const version = "0.7.2";
+const version = "0.8.0";
 
 const userAgent = `cueshit/${version} ( https://deno.land/x/cueshit )`;
 

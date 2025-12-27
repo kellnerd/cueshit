@@ -1,3 +1,4 @@
+import { assert } from "https://deno.land/std@0.210.0/assert/assert.ts";
 import { padNum } from "./utils.ts";
 
 /** Parses a duration in seconds from the given `m:s` or `H:m:s` string. */
@@ -7,6 +8,14 @@ export function parseDuration(time: string): number {
   return timeComponents.reduceRight((seconds, value, index) =>
     seconds + value * (60 ** (maxIndex - index))
   );
+}
+
+/** Parses a duration in seconds from the given `m:ss:ff` string (75 frames per second). */
+export function parseCdFrameDuration(time: string): number {
+  const match = time.match(/(\d{2}):(\d{2}):(\d{2})/);
+  assert(match, `Invalid mm:ss:ff duration: ${time}`);
+  return parseInt(match[1], 10) * 60 + parseInt(match[2], 10) +
+    parseInt(match[3], 10) / 75;
 }
 
 /** Time units which are used by the duration formatter. */
